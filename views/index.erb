@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style type="text/css">
+    html, body {
+      margin: 0;
+    }
+    
+    #map {
+      width: 100%;
+    }
+    
+    .states {
+      fill: #ccc;
+      stroke: #fff;
+    }
+
+    .state-down {
+      fill: #FF5200;
+    }
+
+    .state-up {
+      fill: #B1CCE8;
+    }
+  </style>
+
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://d3js.org/queue.v1.min.js"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script>
+</head>
+<body>
+  <script type="application/javascript">
+  // Shamelessly stolen from http://bl.ocks.org/mbostock/4342045
+  var svg = d3.select("body").append("svg")
+    .attr("id", "map")
+    .attr("viewBox", "0 0 960 500");
+
+  var path = d3.geo.path();
+
+  d3.json("/data/us.json", function(error, json) {
+    if (error) {
+      return console.error(error);
+    }
+  
+    svg.append("g")
+      .attr("class", "states")
+      .selectAll("path")
+        .data(topojson.feature(json, json.objects.states).features)
+        .enter()
+          .append("path")
+          .attr("class", function(d) {
+            var stateName = statesByCode[d.id] && statesByCode[d.id].name.toLowerCase();
+            if (stateName in stateStatus) {
+              return stateStatus[stateName] ? "state-up" : "state-down";
+            }
+            return "state-unknown";
+          })
+          .attr("id", function(d) { return "state-" + d.id; })
+          .attr("d", path);
+  });
+
+  var stateStatus = <%= @state_status.to_json %>;
+  var statesByCode = {
+    "1": { id: "1", name: "Alabama", abbreviation: "AL" },
+    "2": { id: "2", name: "Alaska", abbreviation: "AK" },
+    "4": { id: "4", name: "Arizona", abbreviation: "AZ" },
+    "5": { id: "5", name: "Arkansas", abbreviation: "AR" },
+    "6": { id: "6", name: "California", abbreviation: "CA" },
+    "8": { id: "8", name: "Colorado", abbreviation: "CO" },
+    "9": { id: "9", name: "Connecticut", abbreviation: "CT" },
+    "10": { id: "10", name: "Delaware", abbreviation: "DE" },
+    "11": { id: "11", name: "District of Columbia", abbreviation: "DC" },
+    "12": { id: "12", name: "Florida", abbreviation: "FL" },
+    "13": { id: "13", name: "Georgia", abbreviation: "GA" },
+    "15": { id: "15", name: "Hawaii", abbreviation: "HI" },
+    "16": { id: "16", name: "Idaho", abbreviation: "ID" },
+    "17": { id: "17", name: "Illinois", abbreviation: "IL" },
+    "18": { id: "18", name: "Indiana", abbreviation: "IN" },
+    "19": { id: "19", name: "Iowa", abbreviation: "IA" },
+    "20": { id: "20", name: "Kansas", abbreviation: "KS" },
+    "21": { id: "21", name: "Kentucky", abbreviation: "KY" },
+    "22": { id: "22", name: "Louisiana", abbreviation: "LA" },
+    "23": { id: "23", name: "Maine", abbreviation: "ME" },
+    "24": { id: "24", name: "Maryland", abbreviation: "MD" },
+    "25": { id: "25", name: "Massachusetts", abbreviation: "MA" },
+    "26": { id: "26", name: "Michigan", abbreviation: "MI" },
+    "27": { id: "27", name: "Minnesota", abbreviation: "MN" },
+    "28": { id: "28", name: "Mississippi", abbreviation: "MS" },
+    "29": { id: "29", name: "Missouri", abbreviation: "MO" },
+    "30": { id: "30", name: "Montana", abbreviation: "MT" },
+    "31": { id: "31", name: "Nebraska", abbreviation: "NE" },
+    "32": { id: "32", name: "Nevada", abbreviation: "NV" },
+    "33": { id: "33", name: "New Hampshire", abbreviation: "NH" },
+    "34": { id: "34", name: "New Jersey", abbreviation: "NJ" },
+    "35": { id: "35", name: "New Mexico", abbreviation: "NM" },
+    "36": { id: "36", name: "New York", abbreviation: "NY" },
+    "37": { id: "37", name: "North Carolina", abbreviation: "NC" },
+    "38": { id: "38", name: "North Dakota", abbreviation: "ND" },
+    "39": { id: "39", name: "Ohio", abbreviation: "OH" },
+    "40": { id: "40", name: "Oklahoma", abbreviation: "OK" },
+    "41": { id: "41", name: "Oregon", abbreviation: "OR" },
+    "42": { id: "42", name: "Pennsylvania", abbreviation: "PA" },
+    "44": { id: "44", name: "Rhode Island", abbreviation: "RI" },
+    "45": { id: "45", name: "South Carolina", abbreviation: "SC" },
+    "46": { id: "46", name: "South Dakota", abbreviation: "SD" },
+    "47": { id: "47", name: "Tennessee", abbreviation: "TN" },
+    "48": { id: "48", name: "Texas", abbreviation: "TX" },
+    "49": { id: "49", name: "Utah", abbreviation: "UT" },
+    "50": { id: "50", name: "Vermont", abbreviation: "VT" },
+    "51": { id: "51", name: "Virginia", abbreviation: "VA" },
+    "53": { id: "53", name: "Washington", abbreviation: "WA" },
+    "54": { id: "54", name: "West Virginia", abbreviation: "WV" },
+    "55": { id: "55", name: "Wisconsin", abbreviation: "WI" },
+    "56": { id: "56", name: "Wyoming", abbreviation: "WY" }
+  };
+
+  </script>
+</body>
+</html>
