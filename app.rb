@@ -23,6 +23,12 @@ get '/' do
   
   @state_status = {}
   monitors.each do |monitor|
+    # An event type of `-1` means a monitor is paused/non-operating.
+    # For now, treat that like there's no monitor at all.
+    if monitor['last_event']['type'] == -1
+      next
+    end
+    
     name = monitor['name'].partition(' |')[0].downcase
     # We can have multiple monitors per state (e.g. California).
     # If any are down, we want to count all as down.
