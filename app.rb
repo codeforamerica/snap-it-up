@@ -15,6 +15,12 @@ get '/' do
   request.basic_auth(PINGOMETER_USER, PINGOMETER_PASS)
   response = http.request(request)
   
+  puts "Response: #{response.code}"
+  if response.code == "500"
+    @error_message = "Our status monitoring system, Pingometer, appears to be having problems."
+    return erb :error
+  end
+  
   # FIXME: Not even trying to check for errors ha ha yep not production.
   monitors = JSON.parse(response.body)['monitors']
   @down = monitors
