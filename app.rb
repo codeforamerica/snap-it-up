@@ -12,10 +12,10 @@ get '/' do
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = true
   request = Net::HTTP::Get.new(uri.request_uri)
+  request.initialize_http_header({"Accept" => "application/json"})
   request.basic_auth(PINGOMETER_USER, PINGOMETER_PASS)
   response = http.request(request)
   
-  puts "Response: #{response.code}"
   if response.code == "500"
     @error_message = "Our status monitoring system, Pingometer, appears to be having problems."
     return erb :error
