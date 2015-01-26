@@ -39,6 +39,11 @@ get '/' do
     # We can have multiple monitors per state (e.g. California).
     # If any are down, we want to count all as down.
     if @state_status[name] != false
+      # handle bugginess in pingometer api :(
+      # See https://github.com/Mr0grog/snap-status/issues/5
+      if monitor['last_event'].instance_of?(String)
+        monitor['last_event'] = {'type' => monitor['last_event'].match(/'type':\s*(\d+)/)[1].to_i }
+      end
       @state_status[name] = monitor['last_event']['type'] != 0
     end
   end
