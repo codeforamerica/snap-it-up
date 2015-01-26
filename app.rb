@@ -2,27 +2,20 @@ require 'sinatra'
 require 'net/https'
 require 'uri'
 require 'json'
+require './lib/Pingometer.rb'
 
 PINGOMETER_USER = ENV['PINGOMETER_USER']
 PINGOMETER_PASS = ENV['PINGOMETER_PASS']
 
 get '/' do
   # Get basic info on all monitors.
-  uri = URI.parse("https://app.pingometer.com/api/v1.0/monitors/")
-  http = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl = true
-  request = Net::HTTP::Get.new(uri.request_uri)
-  request.initialize_http_header({"Accept" => "application/json"})
-  request.basic_auth(PINGOMETER_USER, PINGOMETER_PASS)
-  response = http.request(request)
-  
-  if response.code == "500"
+  begin
+    monitors = Pingometer.new(PINGOMETER_USER, PINGOMETER_PASS).monitors
+  rescue
     @error_message = "Our status monitoring system, Pingometer, appears to be having problems."
     return erb :error
   end
   
-  # FIXME: Not even trying to check for errors ha ha yep not production.
-  monitors = JSON.parse(response.body)['monitors']
   @down = monitors
     .select {|monitor| monitor['last_event']['type'] == 0}
     .map {|monitor| monitor['name'].partition(' |')[0].downcase}
