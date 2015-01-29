@@ -2,7 +2,7 @@ require 'sinatra'
 require 'net/https'
 require 'uri'
 require 'json'
-require './lib/Pingometer.rb'
+require './lib/pingometer.rb'
 
 PINGOMETER_USER = ENV['PINGOMETER_USER']
 PINGOMETER_PASS = ENV['PINGOMETER_PASS']
