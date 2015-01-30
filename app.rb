@@ -7,6 +7,8 @@ require './lib/pingometer.rb'
 PINGOMETER_USER = ENV['PINGOMETER_USER']
 PINGOMETER_PASS = ENV['PINGOMETER_PASS']
 
+MonitorList = JSON.parse(File.read('public/data/pingometer_monitors.json'))
+
 get '/' do
   # Get basic info on all monitors.
   begin
@@ -28,13 +30,24 @@ get '/' do
       next
     end
     
-    name = monitor['name'].partition(' |')[0].downcase
+    state = monitor_state(monitor)['state'].downcase
     # We can have multiple monitors per state (e.g. California).
     # If any are down, we want to count all as down.
-    if @state_status[name] != false
-      @state_status[name] = monitor['last_event']['type'] != 0
+    if @state_status[state] != false
+      @state_status[state] = monitor['last_event']['type'] != 0
     end
   end
   
   erb :index
+end
+
+# Kind of hacky thing to get an ensured hostname
+# (transactional tests don't have hostnames, so get the hostname of the URL it first loads).
+# Not in Pingometer API class because there's not a real generic solution to this. (Or should it be?)
+def monitor_hostname(monitor)
+  monitor['hostname'].empty? ? monitor['commands']['1']['get'].match(/^[^\/]+\/\/([^\/]*)/)[1] : monitor['hostname']
+end
+
+def monitor_state(monitor)
+  MonitorList.find {|monitor_info| monitor_info['hostname'] == monitor_hostname(monitor)}
 end
