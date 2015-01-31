@@ -23,6 +23,9 @@ get '/' do
     .map {|monitor| monitor['name'].partition(' |')[0].downcase}
   
   @state_status = {}
+  @state_week_uptime = {}
+  encounters = Hash.new(0)
+  
   monitors.each do |monitor|
     # An event type of `-1` means a monitor is paused/non-operating.
     # For now, treat that like there's no monitor at all.
@@ -36,6 +39,17 @@ get '/' do
     if @state_status[state] != false
       @state_status[state] = monitor['last_event']['type'] != 0
     end
+    
+    total_uptime = ((Date.today - 6)..Date.today).reduce(0) do |sum, date|
+      sum + monitor['reports']['raw'][date.strftime('%Y-%m-%d')]['uT']
+    end
+    week_uptime = total_uptime / 7
+    if encounters[state] > 0
+      week_uptime = (@state_week_uptime[state] * encounters[state] + week_uptime) / (encounters[state] + 1)
+    end
+    @state_week_uptime[state] = week_uptime
+
+    encounters[state] += 1
   end
   
   erb :index

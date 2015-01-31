@@ -6,12 +6,12 @@
       margin: 0;
     }
     
-    #map {
+    .map {
       width: 100%;
     }
     
     .states {
-      fill: #ccc;
+      fill: transparent;
       stroke: #fff;
     }
 
@@ -22,6 +22,14 @@
     .state-up {
       fill: #B1CCE8;
     }
+    
+    .uptime-label {
+      fill: #fff;
+      text-anchor: middle;
+      font-family: helvetica, arial, sans-serif;
+      font-size: 1em;
+      text-shadow: 0 0 4px #B1CCE8;
+    }
   </style>
 
   <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -29,11 +37,15 @@
   <script src="http://d3js.org/topojson.v1.min.js"></script>
 </head>
 <body>
+  <h1>Current Status</h1>
+  <svg id="map" class="map" viewBox="0 0 960 500"></svg>
+  
+  <h1>Uptime over the past week</h1>
+  <svg id="uptime-map" class="map" viewBox="0 0 960 500"></svg>
+  
   <script type="application/javascript">
   // Shamelessly stolen from http://bl.ocks.org/mbostock/4342045
-  var svg = d3.select("body").append("svg")
-    .attr("id", "map")
-    .attr("viewBox", "0 0 960 500");
+  var currentStatusSVG = d3.select("#map");
 
   var path = d3.geo.path();
 
@@ -42,7 +54,7 @@
       return console.error(error);
     }
   
-    svg.append("g")
+    currentStatusSVG.append("g")
       .attr("class", "states")
       .selectAll("path")
         .data(topojson.feature(json, json.objects.states).features)
@@ -58,8 +70,56 @@
           .attr("id", function(d) { return "state-" + d.id; })
           .attr("d", path);
   });
+  
+  var uptimeColor = d3.interpolateRgb("#FF5200", "#B1CCE8");
+  var uptimeSVG = d3.select("#uptime-map");
+  
+  d3.json("/data/us.json", function(error, json) {
+    if (error) {
+      return console.error(error);
+    }
+
+    uptimeSVG.append("g")
+      .attr("class", "states")
+      .selectAll("path")
+        .data(topojson.feature(json, json.objects.states).features)
+        .enter()
+          .append("path")
+          .attr("fill", function(d) {
+            var stateName = statesByCode[d.id] && statesByCode[d.id].name.toLowerCase();
+            if (stateName in stateWeekUptime) {
+              return uptimeColor(stateWeekUptime[stateName] / 100);
+            }
+            return "";
+          })
+          .attr("id", function(d) { return "state-" + d.id; })
+          .attr("d", path);
+          
+    uptimeSVG.append("g")
+      .attr("class", "labels")
+      .selectAll("text")
+        .data(topojson.feature(json, json.objects.states).features)
+        .enter()
+          .append("text")
+          .attr("class", "uptime-label")
+          .attr("x", function(d) {
+            console.log(path.centroid(d));
+            return path.centroid(d)[0] || 0;
+          })
+          .attr("y", function(d) {
+            return path.centroid(d)[1] || 0;
+          })
+          .text(function(d) {
+            var stateName = statesByCode[d.id] && statesByCode[d.id].name.toLowerCase();
+            if (stateName in stateWeekUptime) {
+              return Math.round(stateWeekUptime[stateName] * 10) / 10 + "%";
+            }
+            return "";
+          });
+  });
 
   var stateStatus = <%= @state_status.to_json %>;
+  var stateWeekUptime = <%= @state_week_uptime.to_json %>;
   var statesByCode = {
     "1": { id: "1", name: "Alabama", abbreviation: "AL" },
     "2": { id: "2", name: "Alaska", abbreviation: "AK" },
