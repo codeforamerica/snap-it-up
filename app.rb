@@ -40,10 +40,18 @@ get '/' do
       @state_status[state] = monitor['last_event']['type'] != 0
     end
     
-    total_uptime = ((Date.today - 6)..Date.today).reduce(0) do |sum, date|
-      sum + monitor['reports']['raw'][date.strftime('%Y-%m-%d')]['uT']
+    days_checked = 0
+    # NOTE: no straightforward way to get the UTC date, so we convert a Time object :\
+    today = Time.now.utc.to_date
+    total_uptime = ((today - 6)..today).reduce(0) do |sum, date|
+      date_data = monitor['reports']['raw'][date.strftime('%Y-%m-%d')]
+      if date_data
+        days_checked += 1
+        sum += date_data['uT']
+      end
+      sum
     end
-    week_uptime = total_uptime / 7
+    week_uptime = days_checked > 0 ? (total_uptime / days_checked) : 0
     if encounters[state] > 0
       week_uptime = (@state_week_uptime[state] * encounters[state] + week_uptime) / (encounters[state] + 1)
     end
