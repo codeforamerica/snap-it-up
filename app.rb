@@ -3,9 +3,20 @@ require 'net/https'
 require 'uri'
 require 'json'
 require './lib/pingometer.rb'
+require 'aws-sdk'
+require 'httparty'
 
 PINGOMETER_USER = ENV['PINGOMETER_USER']
 PINGOMETER_PASS = ENV['PINGOMETER_PASS']
+AWS_KEY = ENV['AWS_KEY']
+AWS_SECRET = ENV['AWS_SECRET']
+AWS_BUCKET = ENV['AWS_BUCKET']
+AWS_REGION = ENV['AWS_REGION']
+
+Aws.config.merge!({
+  credentials: Aws::Credentials.new(AWS_KEY, AWS_SECRET),
+  region: AWS_REGION || 'us-east-1'
+})
 
 MonitorList = JSON.parse(File.read('public/data/pingometer_monitors.json'))
 
@@ -61,6 +72,48 @@ get '/' do
   end
   
   erb :index
+end
+
+post '/hooks/event' do
+  content_type :json
+  
+  if !params[:monitor_id]
+    status 400
+    return { error: "No `monitor_id` included in POST." }.to_json
+  end
+  
+  begin
+    monitor = Pingometer.new(PINGOMETER_USER, PINGOMETER_PASS).monitor(params[:monitor_id])
+  rescue
+    status 500
+    return { error: "Our status monitoring system, Pingometer, appears to be having problems." }.to_json
+  end
+  
+  monitor_url = ""
+  if monitor["hostname"] && !monitor["hostname"].empty?
+    protocol = monitor['type'] && !monitor['type'].empty? ? monitor["type"] : "http"
+    host = monitor["hostname"]
+    path = monitor["path"] || ""
+    monitor_url = "#{protocol}://#{host}#{path}"
+  else
+    monitor_url = monitor["commands"]["1"]["get"]
+  end
+  
+  logger.info "Snapshotting #{monitor_url}"
+  snapshot = nil
+  begin
+    snapshot = HTTParty.get("http://pagesnap.herokuapp.com/#{CGI.escape(monitor_url)}.png", :timeout => 20).parsed_response
+  rescue
+    snapshot = File.read("public/images/unreachable.png")
+  end
+    
+  s3 = Aws::S3::Resource.new
+  s3.bucket(AWS_BUCKET).object("#{DateTime.now.iso8601}-#{params[:monitor_id]}").put(
+    body: snapshot,
+    acl: "public-read",
+    content_type: "image/png")
+  
+  return { url: "http://pagesnap.herokuapp.com/#{CGI.escape(monitor_url)}.png" }.to_json
 end
 
 # Kind of hacky thing to get an ensured hostname

@@ -1,11 +1,24 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    aws-sdk (2.0.24)
+      aws-sdk-resources (= 2.0.24)
+    aws-sdk-core (2.0.24)
+      builder (~> 3.0)
+      jmespath (~> 1.0)
+      multi_json (~> 1.0)
+      multi_xml (~> 0.5)
+    aws-sdk-resources (2.0.24)
+      aws-sdk-core (= 2.0.24)
+    builder (3.2.2)
     httparty (0.13.3)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
+    jmespath (1.0.2)
+      multi_json (~> 1.0)
     json (1.8.1)
     kgio (2.9.2)
+    multi_json (1.10.1)
     multi_xml (0.5.5)
     rack (1.6.0)
     rack-protection (1.5.3)
@@ -25,6 +38,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  aws-sdk
   httparty
   sinatra
   unicorn
