@@ -106,9 +106,11 @@ post '/hooks/event' do
   rescue
     snapshot = File.read("public/images/unreachable.png")
   end
-    
+  
+  state_abbreviation = monitor_state(monitor)['state_abbreviation']
+  s3_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{DateTime.now.iso8601}"
   s3 = Aws::S3::Resource.new
-  s3.bucket(AWS_BUCKET).object("#{DateTime.now.iso8601}-#{params[:monitor_id]}").put(
+  s3.bucket(AWS_BUCKET).object(s3_name).put(
     body: snapshot,
     acl: "public-read",
     content_type: "image/png")
