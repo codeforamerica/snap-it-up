@@ -77,6 +77,8 @@ end
 post '/hooks/event' do
   content_type :json
   
+  logger.info "Received event hook for monitor #{params[:monitor_id]}"
+  
   if !params[:monitor_id]
     status 400
     return { error: "No `monitor_id` included in POST." }.to_json
@@ -85,6 +87,7 @@ post '/hooks/event' do
   begin
     monitor = Pingometer.new(PINGOMETER_USER, PINGOMETER_PASS).monitor(params[:monitor_id])
   rescue
+    logger.error "Failed getting info on monitor #{params[:monitor_id]} from Pingometer"
     status 500
     return { error: "Our status monitoring system, Pingometer, appears to be having problems." }.to_json
   end
@@ -114,6 +117,8 @@ post '/hooks/event' do
     body: snapshot,
     acl: "public-read",
     content_type: "image/png")
+  
+  logger.info "Snapshot uploaded to S3: #{s3_name}"
   
   return { url: "http://pagesnap.herokuapp.com/#{CGI.escape(monitor_url)}.png" }.to_json
 end
