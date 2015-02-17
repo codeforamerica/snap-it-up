@@ -111,7 +111,7 @@ post '/hooks/event' do
   end
   
   state_abbreviation = monitor_state(monitor)['state_abbreviation']
-  s3_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{DateTime.now.iso8601}"
+  s3_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{DateTime.now.iso8601}.png"
   s3 = Aws::S3::Resource.new
   s3.bucket(AWS_BUCKET).object(s3_name).put(
     body: snapshot,
