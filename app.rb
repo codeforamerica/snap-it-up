@@ -97,7 +97,8 @@ post '/hooks/event' do
     protocol = monitor['type'] && !monitor['type'].empty? ? monitor["type"] : "http"
     host = monitor["hostname"]
     path = monitor["path"] || ""
-    monitor_url = "#{protocol}://#{host}#{path}"
+    query = monitor["querystring"] && !monitor["querystring"].empty? ? "?#{monitor["querystring"]}" : ""
+    monitor_url = "#{protocol}://#{host}#{path}#{query}"
   else
     monitor_url = monitor["commands"]["1"]["get"]
   end
