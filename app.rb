@@ -92,21 +92,12 @@ post '/hooks/event' do
     return { error: "Our status monitoring system, Pingometer, appears to be having problems." }.to_json
   end
   
-  monitor_url = ""
-  if monitor["hostname"] && !monitor["hostname"].empty?
-    protocol = monitor['type'] && !monitor['type'].empty? ? monitor["type"] : "http"
-    host = monitor["hostname"]
-    path = monitor["path"] || ""
-    query = monitor["querystring"] && !monitor["querystring"].empty? ? "?#{monitor["querystring"]}" : ""
-    monitor_url = "#{protocol}://#{host}#{path}#{query}"
-  else
-    monitor_url = monitor["commands"]["1"]["get"]
-  end
+  page_url = monitor_url(monitor)
   
-  logger.info "Snapshotting #{monitor_url}"
+  logger.info "Snapshotting #{page_url}"
   snapshot = nil
   begin
-    snapshot = HTTParty.get("http://pagesnap.herokuapp.com/#{CGI.escape(monitor_url)}.png", :timeout => 20).parsed_response
+    snapshot = HTTParty.get("http://pagesnap.herokuapp.com/#{CGI.escape(page_url)}.png", :timeout => 20).parsed_response
   rescue
     snapshot = File.read("public/images/unreachable.png")
   end
@@ -121,7 +112,7 @@ post '/hooks/event' do
   
   logger.info "Snapshot uploaded to S3: #{s3_name}"
   
-  return { url: "http://pagesnap.herokuapp.com/#{CGI.escape(monitor_url)}.png" }.to_json
+  return { url: "http://pagesnap.herokuapp.com/#{CGI.escape(page_url)}.png" }.to_json
 end
 
 # Kind of hacky thing to get an ensured hostname
@@ -133,4 +124,17 @@ end
 
 def monitor_state(monitor)
   MonitorList.find {|monitor_info| monitor_info['hostname'] == monitor_hostname(monitor)}
+end
+
+def monitor_url(monitor)
+  if monitor["hostname"] && !monitor["hostname"].empty?
+    protocol = monitor['type'] && !monitor['type'].empty? ? monitor["type"] : "http"
+    host = monitor["hostname"]
+    path = monitor["path"] || ""
+    query = monitor["querystring"] && !monitor["querystring"].empty? ? "?#{monitor["querystring"]}" : ""
+    
+    "#{protocol}://#{host}#{path}#{query}"
+  else
+    monitor["commands"]["1"]["get"]
+  end
 end
