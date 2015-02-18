@@ -104,10 +104,10 @@ post '/hooks/event' do
   end
   
   state_abbreviation = monitor_state(monitor)['state_abbreviation']
-  s3_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{DateTime.now.iso8601}.png"
-  save_snapshot(s3_name, snapshot)
+  file_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{DateTime.now.iso8601}.png"
+  save_snapshot(file_name, snapshot)
   
-  logger.info "Snapshot uploaded to S3: #{s3_name}"
+  logger.info "Snapshot saved: #{file_name}"
   
   return { url: "http://pagesnap.herokuapp.com/#{CGI.escape(page_url)}.png" }.to_json
 end
@@ -137,9 +137,16 @@ def monitor_url(monitor)
 end
 
 def save_snapshot(name, data)
-  s3 = Aws::S3::Resource.new
-  s3.bucket(AWS_BUCKET).object(name).put(
-    body: data,
-    acl: "public-read",
-    content_type: "image/png")
+  if PRODUCTION
+    s3 = Aws::S3::Resource.new
+    s3.bucket(AWS_BUCKET).object(name).put(
+      body: data,
+      acl: "public-read",
+      content_type: "image/png")
+  else
+    Dir.mkdir("./tmp") unless File.exist?("./tmp")
+    File.open("./tmp/#{name}", "w") do |file|
+      file << data
+    end
+  end
 end 
