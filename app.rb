@@ -12,6 +12,7 @@ AWS_KEY = ENV['AWS_KEY']
 AWS_SECRET = ENV['AWS_SECRET']
 AWS_BUCKET = ENV['AWS_BUCKET']
 AWS_REGION = ENV['AWS_REGION']
+PRODUCTION = ENV['RACK_ENV'] == 'production'
 
 Aws.config.merge!({
   credentials: Aws::Credentials.new(AWS_KEY, AWS_SECRET),
@@ -104,11 +105,7 @@ post '/hooks/event' do
   
   state_abbreviation = monitor_state(monitor)['state_abbreviation']
   s3_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{DateTime.now.iso8601}.png"
-  s3 = Aws::S3::Resource.new
-  s3.bucket(AWS_BUCKET).object(s3_name).put(
-    body: snapshot,
-    acl: "public-read",
-    content_type: "image/png")
+  save_snapshot(s3_name, snapshot)
   
   logger.info "Snapshot uploaded to S3: #{s3_name}"
   
@@ -138,3 +135,11 @@ def monitor_url(monitor)
     monitor["commands"]["1"]["get"]
   end
 end
+
+def save_snapshot(name, data)
+  s3 = Aws::S3::Resource.new
+  s3.bucket(AWS_BUCKET).object(name).put(
+    body: data,
+    acl: "public-read",
+    content_type: "image/png")
+end 
