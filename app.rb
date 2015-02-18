@@ -104,7 +104,8 @@ post '/hooks/event' do
   end
   
   state_abbreviation = monitor_state(monitor)['state_abbreviation']
-  file_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{DateTime.now.iso8601}.png"
+  state_status = monitor['last_event']['type'] != 0 ? "UP" : "DOWN"
+  file_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{state_status}-#{DateTime.now.iso8601}.png"
   save_snapshot(file_name, snapshot)
   
   logger.info "Snapshot saved: #{file_name}"
