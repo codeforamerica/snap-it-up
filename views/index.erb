@@ -91,7 +91,8 @@
           .attr("fill", function(d) {
             var stateName = statesByCode[d.id] && statesByCode[d.id].name.toLowerCase();
             if (stateName in stateWeekUptime) {
-              return uptimeColor(stateWeekUptime[stateName] / 100);
+              var normalizedUptime = Math.max(stateWeekUptime[stateName] - 80, 0) / 20;
+              return uptimeColor(normalizedUptime);
             }
             return "";
           })
