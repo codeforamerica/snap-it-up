@@ -2,6 +2,7 @@ require 'sinatra'
 require 'net/https'
 require 'uri'
 require 'json'
+require 'fileutils'
 require './lib/pingometer.rb'
 require 'aws-sdk'
 require 'httparty'
@@ -147,6 +148,9 @@ def save_snapshot(name, data)
       content_type: "image/png")
   else
     Dir.mkdir("./tmp") unless File.exist?("./tmp")
+    if !File.exist?(File.dirname("./tmp/#{name}"))
+      FileUtils.mkdir_p(File.dirname("./tmp/#{name}"))
+    end
     File.open("./tmp/#{name}", "w") do |file|
       file << data
     end
