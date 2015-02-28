@@ -10,6 +10,9 @@ GEM
       multi_xml (~> 0.5)
     aws-sdk-resources (2.0.24)
       aws-sdk-core (= 2.0.24)
+    bson (1.12.0)
+    bson_ext (1.12.0)
+      bson (~> 1.12.0)
     builder (3.2.2)
     httparty (0.13.3)
       json (~> 1.8)
@@ -18,6 +21,8 @@ GEM
       multi_json (~> 1.0)
     json (1.8.1)
     kgio (2.9.2)
+    mongo (1.12.0)
+      bson (= 1.12.0)
     multi_json (1.10.1)
     multi_xml (0.5.5)
     rack (1.6.0)
@@ -39,6 +44,8 @@ PLATFORMS
 
 DEPENDENCIES
   aws-sdk
+  bson_ext
   httparty
+  mongo
   sinatra
   unicorn

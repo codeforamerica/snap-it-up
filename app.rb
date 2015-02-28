@@ -6,6 +6,7 @@ require 'fileutils'
 require './lib/pingometer.rb'
 require 'aws-sdk'
 require 'httparty'
+require 'mongo'
 
 PINGOMETER_USER = ENV['PINGOMETER_USER']
 PINGOMETER_PASS = ENV['PINGOMETER_PASS']
@@ -14,6 +15,7 @@ AWS_SECRET = ENV['AWS_SECRET']
 AWS_BUCKET = ENV['AWS_BUCKET']
 AWS_REGION = ENV['AWS_REGION']
 PRODUCTION = ENV['RACK_ENV'] == 'production'
+MONGO_URI = ENV['MONGO_URI'] || ENV['MONGOLAB_URI'] || "mongodb://localhost:27017/snap_it_up"
 
 Aws.config.merge!({
   credentials: Aws::Credentials.new(AWS_KEY, AWS_SECRET),
@@ -21,6 +23,9 @@ Aws.config.merge!({
 })
 
 MonitorList = JSON.parse(File.read('public/data/pingometer_monitors.json'))
+
+MongoConn = Mongo::MongoClient.from_uri(MONGO_URI)
+DB = MongoConn.db(URI.parse(MONGO_URI).path.slice(1..-1))
 
 get '/' do
   # Get basic info on all monitors.
@@ -94,6 +99,24 @@ post '/hooks/event' do
     return { error: "Our status monitoring system, Pingometer, appears to be having problems." }.to_json
   end
   
+  state_abbreviation = monitor_state(monitor)['state_abbreviation']
+  state_status = monitor['last_event']['type'] != 0 ? "UP" : "DOWN"
+  event_id = monitor['last_event']['id']
+  
+  # It's almost ISO8601, except it's missing the time zone :(
+  # Hopefully Pingometer will fix this, so be future proof by trying to parse before fixing.
+  event_time = Time.parse(monitor['last_event']['utc_timestamp'])
+  if !event_time.utc?
+    event_time = Time.parse("#{monitor['last_event']['utc_timestamp']}Z")
+  end
+  
+  DB["monitor_events"].insert({
+    state: state_abbreviation,
+    monitor: params[:monitor_id],
+    status: monitor['last_event']['type'],
+    date: event_time
+  })
+  
   page_url = monitor_url(monitor)
   
   logger.info "Snapshotting #{page_url}"
@@ -104,13 +127,20 @@ post '/hooks/event' do
     snapshot = File.read("public/images/unreachable.png")
   end
   
-  state_abbreviation = monitor_state(monitor)['state_abbreviation']
-  state_status = monitor['last_event']['type'] != 0 ? "UP" : "DOWN"
-  event_id = monitor['last_event']['id']
   file_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{state_status}-#{event_id}.png"
-  save_snapshot(file_name, snapshot)
+  url = save_snapshot(file_name, snapshot)
   
-  logger.info "Snapshot saved: #{file_name}"
+  DB["snapshots"].insert({
+    state: state_abbreviation,
+    monitor: params[:monitor_id],
+    status: state_status,
+    event: event_id,
+    date: Time.now,
+    name: file_name,
+    url: url,
+  })
+  
+  logger.info "Snapshot saved: #{file_name}, #{url}"
   
   return { url: "http://pagesnap.herokuapp.com/#{CGI.escape(page_url)}.png" }.to_json
 end
@@ -146,6 +176,7 @@ def save_snapshot(name, data)
       body: data,
       acl: "public-read",
       content_type: "image/png")
+    s3.bucket(AWS_BUCKET).object(name).public_url
   else
     Dir.mkdir("./tmp") unless File.exist?("./tmp")
     if !File.exist?(File.dirname("./tmp/#{name}"))
@@ -154,5 +185,6 @@ def save_snapshot(name, data)
     File.open("./tmp/#{name}", "w") do |file|
       file << data
     end
+    nil
   end
 end 
