@@ -17,7 +17,7 @@ What's the point? SNAP services can be critical for those who receive them. Howe
 There are two sites currently related to this work:
 
 - http://status.citizenonboard.com/ Shows basic info about SNAP sites in the state of California and allows anyone to subscribe to notifications when sites go up or down. It's powered by [statuspage.io](https://www.statuspage.io).
-- http://snap-status.herokuapp.com/ Is the site built with the code in this repository. At the moment, it's mostly a basis for examination and experimentation, gathering data, and some [very] basic visualizations. We hope to eventually have time to grow it into something more substantial—a tool for education people unfamiliar with the issue and for people interested in the details to learn more.
+- http://snap-status.herokuapp.com/ Is the site built with the code in this repository. At the moment, it's mostly a basis for examination and experimentation, gathering data, and some [very] basic visualizations. We hope to eventually have time to grow it into something more substantial—a tool for educating people unfamiliar with the issue and for people interested in the details to learn more.
 
 Both sites are powered by same underlying monitoring infrastructure. At the moment, that infrastructure is [Pingometer](http://pingometer.com).
 
