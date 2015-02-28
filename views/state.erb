@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title><%= state %></title>
+  <style type="text/css" media="screen">
+  .status-unknown .status {
+    color: #999;
+  }
+  .status-down .status {
+    color: #FF5200;
+  }
+  .status-up .status {
+    color: #B1CCE8;
+  }
+  </style>
+</head>
+<body>
+  <h1><%= state %></h1>
+  
+  <% monitors.each do |monitor| %>
+    <section id="state-<%= monitor[:meta]["state_abbreviation"] %>" class="status-<%= monitor[:status] %>">
+      <h2>
+        <%= monitor[:name] %> - 
+        <span class="status">
+          <% if monitor[:status] == :unknown %>
+            not monitored
+          <% elsif monitor[:status] == :down %>
+            down!
+          <% else %>
+            operating normally
+          <% end %>
+        </span>
+      </h2>
+      <p><a href="<%= monitor[:url] %>"><%= monitor[:url] %></a></p>
+      <% monitor[:snapshots].each do |snapshot| %>
+        <a href="<%= snapshot.object.public_url %>"><img src="<%= snapshot.object.public_url %>" width="200" alt="" /></a>
+      <% end %>
+    </section>
+  <% end %>
+  
+</body>
+</html>

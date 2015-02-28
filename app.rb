@@ -76,6 +76,52 @@ get '/' do
   erb :index
 end
 
+get '/states/:state_abbreviation' do
+  state_abbreviation = params[:state_abbreviation].downcase
+  monitors = MonitorList.find_all {|monitor_info| monitor_info["state_abbreviation"].downcase == state_abbreviation}
+  if monitors.empty?
+    monitor = MonitorList.find {|monitor_info| monitor_info["state"].downcase == state_abbreviation}
+    if monitor
+      redirect "/states/#{monitor['state_abbreviation']}"
+    else
+      raise Sinatra::NotFound
+    end
+    return
+  end
+  
+  state = monitors[0]["state"]
+  
+  s3 = Aws::S3::Resource.new
+  snapshots = s3.bucket(AWS_BUCKET).objects.find_all {|object| object.key.start_with? "#{state_abbreviation.upcase}-"}
+  
+  begin
+    all_monitors = Pingometer.new(PINGOMETER_USER, PINGOMETER_PASS).monitors
+  rescue
+    @error_message = "Our status monitoring system, Pingometer, appears to be having problems."
+    return erb :error
+  end
+  
+  monitors_data = []
+  all_monitors.each do |monitor_data|
+    meta = monitors.find {|monitor| monitor["hostname"] == monitor_hostname(monitor_data)}
+    if meta
+      monitors_data << {
+        :name => monitor_data["name"],
+        :url => monitor_url(monitor_data),
+        :status => monitor_data['last_event']['type'] == -1 ? :unknown : (monitor_data['last_event']['type'] == 0 ? :down : :up),
+        :meta => meta,
+        :details => monitor_data,
+        :snapshots => snapshots.find_all {|snapshot| snapshot.key.start_with? "#{state_abbreviation.upcase}-#{monitor_data['id']}"}
+      }
+    end
+  end
+  
+  erb :state, {:locals => {
+    state: state,
+    monitors: monitors_data
+  }}
+end
+
 post '/hooks/event' do
   content_type :json
   

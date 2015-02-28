@@ -14,6 +14,10 @@
       fill: transparent;
       stroke: #fff;
     }
+    
+/*    .state {
+      cursor: pointer;
+    }*/
 
     .state-down {
       fill: #FF5200;
@@ -62,13 +66,16 @@
       .selectAll("path")
         .data(topojson.feature(json, json.objects.states).features)
         .enter()
+          .append("a")
+          .attr("xlink:href", function(d) { return statesByCode[d.id] ? ("/states/" + statesByCode[d.id].abbreviation) : "#"; })
           .append("path")
           .attr("class", function(d) {
             var stateName = statesByCode[d.id] && statesByCode[d.id].name.toLowerCase();
+            var statusClass = "state-unknown";
             if (stateName in stateStatus) {
-              return stateStatus[stateName] ? "state-up" : "state-down";
+              statusClass = stateStatus[stateName] ? "state-up" : "state-down";
             }
-            return "state-unknown";
+            return "state " + statusClass;
           })
           .attr("id", function(d) { return "state-" + d.id; })
           .attr("d", path);
@@ -87,6 +94,8 @@
       .selectAll("path")
         .data(topojson.feature(json, json.objects.states).features)
         .enter()
+          .append("a")
+          .attr("xlink:href", function(d) { return statesByCode[d.id] ? ("/states/" + statesByCode[d.id].abbreviation) : "#"; })
           .append("path")
           .attr("fill", function(d) {
             var stateName = statesByCode[d.id] && statesByCode[d.id].name.toLowerCase();
@@ -97,13 +106,18 @@
             return "";
           })
           .attr("id", function(d) { return "state-" + d.id; })
-          .attr("d", path);
+          .attr("d", path)
+          // .on("click", function(d) {
+          //   window.location = "/states/" + statesByCode[d.id].abbreviation;
+          // });
           
     uptimeSVG.append("g")
       .attr("class", "labels")
       .selectAll("text")
         .data(topojson.feature(json, json.objects.states).features)
         .enter()
+          .append("a")
+          .attr("xlink:href", function(d) { return statesByCode[d.id] ? ("/states/" + statesByCode[d.id].abbreviation) : "#"; })
           .append("text")
           .attr("class", "uptime-label")
           .attr("x", function(d) {
