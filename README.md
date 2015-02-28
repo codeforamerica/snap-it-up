@@ -30,4 +30,4 @@ Thanks for being interested! First, check out the [issues list](https://github.c
 This project is open source and licensed under the [BSD 3-clause license][LICENSE].
 Copyright (c) 2014-2015 Code for America. See [LICENSE][] for details.
 
-[LICENSE]: https://github.com/codeforamerica/snap-it-up/blob/master/LCIENSE
+[LICENSE]: https://github.com/codeforamerica/snap-it-up/blob/master/LICENSE
