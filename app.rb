@@ -110,7 +110,7 @@ post '/hooks/event' do
     event_time = Time.parse("#{monitor['last_event']['utc_timestamp']}Z")
   end
   
-  DB["monitor_events"].insert({
+  local_event_id = DB["monitor_events"].insert({
     state: state_abbreviation,
     monitor: params[:monitor_id],
     status: monitor['last_event']['type'],
@@ -135,7 +135,8 @@ post '/hooks/event' do
     state: state_abbreviation,
     monitor: params[:monitor_id],
     status: state_status,
-    event: event_id,
+    event_id: local_event_id,
+    event_pingometer_id: event_id,
     date: Time.now,
     name: file_name,
     url: url,
