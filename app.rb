@@ -114,7 +114,8 @@ post '/hooks/event' do
     state: state_abbreviation,
     monitor: params[:monitor_id],
     status: monitor['last_event']['type'],
-    date: event_time
+    date: event_time,
+    pingometer_id: event_id
   })
   
   page_url = monitor_url(monitor)
