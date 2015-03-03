@@ -144,7 +144,8 @@ post '/hooks/event' do
   end
   
   state_abbreviation = monitor_state(monitor)['state_abbreviation']
-  state_status = monitor['last_event']['type'] != 0 ? "UP" : "DOWN"
+  event_status = monitor['last_event']['type']
+  state_status = event_status != 0 ? "UP" : "DOWN"
   event_id = monitor['last_event']['id']
   
   # It's almost ISO8601, except it's missing the time zone :(
@@ -157,10 +158,34 @@ post '/hooks/event' do
   local_event_id = DB["monitor_events"].insert({
     state: state_abbreviation,
     monitor: params[:monitor_id],
-    status: monitor['last_event']['type'],
+    status: event_status,
     date: event_time,
     pingometer_id: event_id
   })
+  
+  # Update incidents
+  last_incident = DB["incidents"].find({monitor: params[:monitor_id]}).sort({start_date: -1}).first
+  if event_status == 0
+    if last_incident && last_incident["end_date"].nil?
+      last_incident["events"] << local_event_id
+      DB["incidents"].update({"_id" => last_incident["_id"]}, last_incident)
+    else
+      DB["incidents"].insert({
+        "monitor" => params[:monitor_id],
+        "state" => state_abbreviation,
+        "start_date" => event_time,
+        "end_date" => nil,
+        "events" => [local_event_id]
+      })
+    end
+  else
+    if last_incident && last_incident["end_date"].nil?
+      last_incident["events"] << local_event_id
+      last_incident["end_date"] = event_time
+      last_incident["milliseconds"] = ((last_incident["end_date"] - last_incident["start_date"]) * 1000).round
+      DB["incidents"].update({"_id" => last_incident["_id"]}, last_incident)
+    end
+  end
   
   page_url = monitor_url(monitor)
   
