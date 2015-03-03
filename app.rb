@@ -95,9 +95,7 @@ get '/states/:state_abbreviation' do
   end
   
   state = monitors[0]["state"]
-  
-  s3 = Aws::S3::Resource.new
-  snapshots = s3.bucket(AWS_BUCKET).objects.find_all {|object| object.key.start_with? "#{state_abbreviation.upcase}-"}
+  snapshots = DB["snapshots"].find("state" => state_abbreviation.upcase).to_a
   
   begin
     all_monitors = Pingometer.new(PINGOMETER_USER, PINGOMETER_PASS).monitors
@@ -116,7 +114,7 @@ get '/states/:state_abbreviation' do
         :status => monitor_data['last_event']['type'] == -1 ? :unknown : (monitor_data['last_event']['type'] == 0 ? :down : :up),
         :meta => meta,
         :details => monitor_data,
-        :snapshots => snapshots.find_all {|snapshot| snapshot.key.start_with? "#{state_abbreviation.upcase}-#{monitor_data['id']}"}
+        :snapshots => snapshots.find_all {|snapshot| snapshot["name"].start_with? "#{state_abbreviation.upcase}-#{monitor_data['id']}"} .sort {|a, b| b["date"] <=> a["date"]}
       }
     end
   end

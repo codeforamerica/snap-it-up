@@ -12,6 +12,19 @@
   .status-up .status {
     color: #B1CCE8;
   }
+  
+  .snapshots {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
+  .snapshots li {
+    display: inline-block;
+  }
+  .snapshots a,
+  .snapshots img {
+    display: block;
+  }
   </style>
 </head>
 <body>
@@ -32,8 +45,20 @@
         </span>
       </h2>
       <p><a href="<%= monitor[:url] %>"><%= monitor[:url] %></a></p>
-      <% monitor[:snapshots].each do |snapshot| %>
-        <a href="<%= snapshot.object.public_url %>"><img src="<%= snapshot.object.public_url %>" width="200" alt="" /></a>
+      
+      Most recent snapshots:
+      <ol class="snapshots">
+      <% monitor[:snapshots].slice(0, 10).each do |snapshot, index| %>
+        <li>
+          <a href="<%= snapshot["url"] %>">
+            <img src="<%= snapshot["url"] %>" width="200" alt="" />
+            <%= snapshot["date"].getlocal.strftime("%Y-%m-%d %I:%M %P") %>
+          </a>
+        </li>
+      <% end %>
+      </ol>
+      <% if monitor[:snapshots].count > 10 %>
+        …and <%= monitor[:snapshots].count - 10 %> more.
       <% end %>
     </section>
   <% end %>
