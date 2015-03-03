@@ -7,6 +7,7 @@ require './lib/pingometer.rb'
 require 'aws-sdk'
 require 'httparty'
 require 'mongo'
+require './lib/helpers.rb'
 
 PINGOMETER_USER = ENV['PINGOMETER_USER']
 PINGOMETER_PASS = ENV['PINGOMETER_PASS']
