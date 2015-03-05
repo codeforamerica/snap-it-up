@@ -16,6 +16,7 @@ AWS_BUCKET = ENV['AWS_BUCKET']
 AWS_REGION = ENV['AWS_REGION']
 PRODUCTION = ENV['RACK_ENV'] == 'production'
 MONGO_URI = ENV['MONGO_URI'] || ENV['MONGOLAB_URI'] || "mongodb://localhost:27017/snap_it_up"
+PAGESNAP_URL = ENV['PAGESNAP_URL'] || "http://pagesnap.herokuapp.com"
 
 Aws.config.merge!({
   credentials: Aws::Credentials.new(AWS_KEY, AWS_SECRET),
@@ -169,7 +170,7 @@ post '/hooks/event' do
   
   logger.info "Snapshot saved: #{file_name}, #{url}"
   
-  return { url: "http://pagesnap.herokuapp.com/#{CGI.escape(page_url)}.png" }.to_json
+  return { url: "#{PAGESNAP_URL}/#{CGI.escape(page_url)}.png" }.to_json
 end
 
 # Kind of hacky thing to get an ensured hostname
