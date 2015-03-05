@@ -149,7 +149,7 @@ post '/hooks/event' do
   logger.info "Snapshotting #{page_url}"
   snapshot = nil
   begin
-    snapshot = HTTParty.get("http://pagesnap.herokuapp.com/#{CGI.escape(page_url)}.png", :timeout => 20).parsed_response
+    snapshot = HTTParty.get("#{PAGESNAP_URL}/#{CGI.escape(page_url)}.png", :timeout => 20).parsed_response
   rescue
     snapshot = File.read("public/images/unreachable.png")
   end

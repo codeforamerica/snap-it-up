@@ -3,6 +3,8 @@
 require 'optparse'
 require './app.rb'
 
+PAGESNAP_URL = ENV['PAGESNAP_URL'] || "http://pagesnap.herokuapp.com"
+
 states = []
 time_zones = []
 monitors = []
@@ -36,7 +38,7 @@ monitors.each do |monitor_info|
   puts "Snapshotting #{page_url}"
   snapshot = nil
   begin
-    snapshot = HTTParty.get("http://pagesnap.herokuapp.com/#{CGI.escape(page_url)}.png", :timeout => 20).parsed_response
+    snapshot = HTTParty.get("#{PAGESNAP_URL}/#{CGI.escape(page_url)}.png", :timeout => 20).parsed_response
   rescue
     snapshot = File.read("public/images/unreachable.png")
   end
