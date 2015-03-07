@@ -32,8 +32,8 @@ get '/' do
   # Get basic info on all monitors.
   begin
     monitors = Pingometer.new(PINGOMETER_USER, PINGOMETER_PASS).monitors
-  rescue
-    @error_message = "Our status monitoring system, Pingometer, appears to be having problems."
+  rescue => error
+    @error_message = "Our status monitoring system, Pingometer, appears to be having problems. #{error}"
     return erb :error
   end
   
