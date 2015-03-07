@@ -5,6 +5,7 @@ require 'json'
 require 'fileutils'
 require './lib/pingometer.rb'
 require './lib/pagesnap.rb'
+require './lib/browserstack.rb'
 require 'aws-sdk'
 require 'httparty'
 require 'mongo'
@@ -18,13 +19,19 @@ AWS_REGION = ENV['AWS_REGION']
 PRODUCTION = ENV['RACK_ENV'] == 'production'
 MONGO_URI = ENV['MONGO_URI'] || ENV['MONGOLAB_URI'] || "mongodb://localhost:27017/snap_it_up"
 PAGESNAP_URL = ENV['PAGESNAP_URL']
+BROWSERSTACK_USER = ENV['BROWSERSTACK_USER']
+BROWSERSTACK_KEY = ENV['BROWSERSTACK_KEY']
 
 Aws.config.merge!({
   credentials: Aws::Credentials.new(AWS_KEY, AWS_SECRET),
   region: AWS_REGION || 'us-east-1'
 })
 
-Snapshotter = PageSnap.new(PAGESNAP_URL)
+if BROWSERSTACK_USER && BROWSERSTACK_KEY
+  Snapshotter = Browserstack.new(BROWSERSTACK_USER, BROWSERSTACK_KEY)
+else
+  Snapshotter = PageSnap.new(PAGESNAP_URL)
+end
 
 MonitorList = JSON.parse(File.read('public/data/pingometer_monitors.json'))
 

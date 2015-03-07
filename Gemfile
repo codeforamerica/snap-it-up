@@ -8,3 +8,6 @@ gem "aws-sdk"
 gem "mongo"
 gem "bson_ext"
 gem "rake"
+
+# For browserstack
+gem "selenium-webdriver"
