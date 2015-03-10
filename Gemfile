@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 ruby "2.2.0"
 
-gem "unicorn"
+gem "puma"
 gem "sinatra"
 gem "httparty"
 gem "aws-sdk"
