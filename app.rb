@@ -8,7 +8,8 @@ require './lib/pagesnap.rb'
 require './lib/browserstack.rb'
 require 'aws-sdk'
 require 'httparty'
-require 'mongo'
+# require 'mongo'
+require 'mongoid'
 
 PINGOMETER_USER = ENV['PINGOMETER_USER']
 PINGOMETER_PASS = ENV['PINGOMETER_PASS']
@@ -21,6 +22,16 @@ MONGO_URI = ENV['MONGO_URI'] || ENV['MONGOLAB_URI'] || "mongodb://localhost:2701
 PAGESNAP_URL = ENV['PAGESNAP_URL']
 BROWSERSTACK_USER = ENV['BROWSERSTACK_USER']
 BROWSERSTACK_KEY = ENV['BROWSERSTACK_KEY']
+
+configure do
+  Mongoid.configure do |config|
+    config.sessions = { 
+      :default => {
+        :uri => MONGO_URI
+      }
+    }
+  end
+end
 
 Aws.config.merge!({
   credentials: Aws::Credentials.new(AWS_KEY, AWS_SECRET),
@@ -35,8 +46,8 @@ end
 
 MonitorList = JSON.parse(File.read('public/data/pingometer_monitors.json'))
 
-MongoConn = Mongo::MongoClient.from_uri(MONGO_URI)
-DB = MongoConn.db(URI.parse(MONGO_URI).path.slice(1..-1))
+# MongoConn = Mongo::MongoClient.from_uri(MONGO_URI)
+# DB = MongoConn.db(URI.parse(MONGO_URI).path.slice(1..-1))
 
 get '/' do
   # Get basic info on all monitors.
