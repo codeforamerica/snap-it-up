@@ -16,18 +16,15 @@ namespace :pingometer do
           event_time = Time.parse("#{event['utc_timestamp']}Z")
         end
         
-        found = DB["monitor_events"].find_one({
-          monitor: monitor['id'],
-          date: event_time
-        })
+        found = MonitorEvent.where(monitor: monitor['id'], date: event_time).exists?
         
         if !found
-          DB["monitor_events"].insert({
+          MonitorEvent.create(
             state: state_abbreviation,
             monitor: monitor['id'],
             status: event['type'],
             date: event_time
-          })
+          )
         end
       end
     end
