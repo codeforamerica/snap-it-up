@@ -6,32 +6,31 @@ namespace :analysis do
       
       # Roll through events in date order and create incidents representing consecutive series of down events
       incident = nil
-      DB["monitor_events"].find({"monitor" => monitor["id"]}).sort({date: 1}).each do |event|
-        if event["status"] == 0
+      MonitorEvent.where(monitor: monitor['id']).sort({date: 1}).each do |event|
+        if event.status == 0
           if incident
-            incident["events"] << event["_id"]
+            incident.events << event.id
           else
-            incident = {
-              "monitor" => event["monitor"],
-              "state" => event["state"],
-              "start_date" => event["date"],
-              "end_date" => nil,
-              "events" => [event["_id"]]
-            }
+            # TODO: skip all the everything if we find an existing incident with an end_date
+            incident = Incident.find_or_initialize_by(monitor: event.monitor, start_date: event.date) do |incident|
+              incident.state = event.state
+              incident.events = [event.id]
+            end
           end
         else
           if incident
-            incident["events"] << event["_id"]
-            incident["end_date"] = event["date"]
-            incident["milliseconds"] = ((incident["end_date"] - incident["start_date"]) * 1000).round
-            DB["incidents"].update({monitor: incident["monitor"], start_date: incident["start_date"]}, incident, {upsert: true})
+            incident.events << event.id
+            incident.end_date = event.date
+            incident.milliseconds = ((incident.end_date - incident.start_date) * 1000).round
+            incident.save
             incident = nil
           end
         end
       end
       
+      # We got to the end with an ongoing incident
       if incident
-        DB["incidents"].update({monitor: incident["monitor"], start_date: incident["start_date"]}, incident, {upsert: true})
+        incident.save
       end
     end
 
