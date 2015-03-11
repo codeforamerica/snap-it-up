@@ -8,8 +8,10 @@ require './lib/pagesnap.rb'
 require './lib/browserstack.rb'
 require 'aws-sdk'
 require 'httparty'
-# require 'mongo'
 require 'mongoid'
+require './models/monitor_event.rb'
+require './models/snapshot.rb'
+require './models/incident.rb'
 
 PINGOMETER_USER = ENV['PINGOMETER_USER']
 PINGOMETER_PASS = ENV['PINGOMETER_PASS']
@@ -45,9 +47,6 @@ else
 end
 
 MonitorList = JSON.parse(File.read('public/data/pingometer_monitors.json'))
-
-# MongoConn = Mongo::MongoClient.from_uri(MONGO_URI)
-# DB = MongoConn.db(URI.parse(MONGO_URI).path.slice(1..-1))
 
 get '/' do
   # Get basic info on all monitors.
@@ -133,35 +132,36 @@ post '/hooks/event' do
     event_time = Time.parse("#{monitor['last_event']['utc_timestamp']}Z")
   end
   
-  local_event_id = DB["monitor_events"].insert({
+  local_event = MonitorEvent.create(
     state: state_abbreviation,
     monitor: params[:monitor_id],
     status: event_status,
     date: event_time,
     pingometer_id: event_id
-  })
+  )
   
   # Update incidents
-  last_incident = DB["incidents"].find({monitor: params[:monitor_id]}).sort({start_date: -1}).first
+  last_incident = Incident.where(monitor: params[:monitor_id]).sort({start_date: -1}).first
   if event_status == 0
-    if last_incident && last_incident["end_date"].nil?
-      last_incident["events"] << local_event_id
-      DB["incidents"].update({"_id" => last_incident["_id"]}, last_incident)
+    if last_incident && last_incident.end_date.nil?
+      last_incident.events << local_event.id
+      # XXX: MAKE SURE THIS WORKS
+      last_incident.save
     else
-      DB["incidents"].insert({
-        "monitor" => params[:monitor_id],
-        "state" => state_abbreviation,
-        "start_date" => event_time,
-        "end_date" => nil,
-        "events" => [local_event_id]
-      })
+      Incident.create(
+        monitor: params[:monitor_id],
+        state: state_abbreviation,
+        start_date: event_time,
+        end_date: nil,
+        events: [local_event.id]
+      )
     end
   else
-    if last_incident && last_incident["end_date"].nil?
-      last_incident["events"] << local_event_id
-      last_incident["end_date"] = event_time
-      last_incident["milliseconds"] = ((last_incident["end_date"] - last_incident["start_date"]) * 1000).round
-      DB["incidents"].update({"_id" => last_incident["_id"]}, last_incident)
+    if last_incident && last_incident.end_date.nil?
+      last_incident.events << local_event.id
+      last_incident.end_date = event_time
+      last_incident.milliseconds = ((last_incident.end_date - last_incident.start_date) * 1000).round
+      last_incident.save
     end
   end
   
@@ -178,16 +178,16 @@ post '/hooks/event' do
   file_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{state_status}-#{event_id}.png"
   url = save_snapshot(file_name, snapshot)
   
-  DB["snapshots"].insert({
+  Snapshot.create(
     state: state_abbreviation,
     monitor: params[:monitor_id],
     status: state_status,
-    event_id: local_event_id,
+    event_id: local_event.id,
     event_pingometer_id: event_id,
     date: Time.now,
     name: file_name,
-    url: url,
-  })
+    url: url
+  )
   
   logger.info "Snapshot saved: #{file_name}, #{url}"
   
