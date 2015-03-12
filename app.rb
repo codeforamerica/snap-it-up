@@ -8,7 +8,6 @@ require './lib/pagesnap.rb'
 require './lib/browserstack.rb'
 require 'aws-sdk'
 require 'httparty'
-require './lib/helpers.rb'
 require 'mongoid'
 require './models/monitor_event.rb'
 require './models/snapshot.rb'
@@ -117,7 +116,7 @@ get '/states/:state_abbreviation' do
   end
   
   state = monitors[0]["state"]
-  snapshots = DB["snapshots"].find("state" => state_abbreviation.upcase).to_a
+  snapshots = Snapshot.where(state: state_abbreviation.upcase).sort(date: -1)
   
   begin
     all_monitors = Pingometer.new(PINGOMETER_USER, PINGOMETER_PASS).monitors
@@ -136,7 +135,7 @@ get '/states/:state_abbreviation' do
         :status => monitor_data['last_event']['type'] == -1 ? :unknown : (monitor_data['last_event']['type'] == 0 ? :down : :up),
         :meta => meta,
         :details => monitor_data,
-        :snapshots => snapshots.find_all {|snapshot| snapshot["name"].start_with? "#{state_abbreviation.upcase}-#{monitor_data['id']}"} .sort {|a, b| b["date"] <=> a["date"]}
+        :snapshots => snapshots.find_all {|snapshot| snapshot.name.start_with? "#{state_abbreviation.upcase}-#{monitor_data['id']}"}
       }
     end
   end

@@ -50,9 +50,9 @@
       <ol class="snapshots">
       <% monitor[:snapshots].slice(0, 10).each do |snapshot, index| %>
         <li>
-          <a href="<%= snapshot["url"] %>">
-            <img src="<%= snapshot_url(snapshot, {w: 200}) %>" alt="" />
-            <%= snapshot["date"].getlocal.strftime("%Y-%m-%d %I:%M %P") %>
+          <a href="<%= snapshot.url %>">
+            <img src="<%= snapshot.render_url({w: 200}) %>" alt="" />
+            <%= snapshot.date.getlocal.strftime("%Y-%m-%d %I:%M %P") %>
           </a>
         </li>
       <% end %>
