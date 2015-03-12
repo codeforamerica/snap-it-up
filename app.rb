@@ -141,29 +141,9 @@ post '/hooks/event' do
   )
   
   # Update incidents
-  last_incident = Incident.where(monitor: params[:monitor_id]).sort({start_date: -1}).first
-  if event_status == 0
-    if last_incident && last_incident.end_date.nil?
-      last_incident.events << local_event.id
-      # XXX: MAKE SURE THIS WORKS
-      last_incident.save
-    else
-      Incident.create(
-        monitor: params[:monitor_id],
-        state: state_abbreviation,
-        start_date: event_time,
-        end_date: nil,
-        events: [local_event.id]
-      )
-    end
-  else
-    if last_incident && last_incident.end_date.nil?
-      last_incident.events << local_event.id
-      last_incident.end_date = event_time
-      last_incident.milliseconds = ((last_incident.end_date - last_incident.start_date) * 1000).round
-      last_incident.save
-    end
-  end
+  last_incident = Incident.where(monitor: params[:monitor_id]).sort({start_date: -1}).first || Incident.new
+  last_incident.add_event(local_event)
+  last_incident.save
   
   page_url = monitor_url(monitor)
   

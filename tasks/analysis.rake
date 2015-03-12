@@ -5,23 +5,16 @@ namespace :analysis do
       puts "Creating incidents for #{monitor['id']}"
       
       # Roll through events in date order and create incidents representing consecutive series of down events
+      # NOTE: a lot the ifs here are necessary because sometimes we have consecutive up or down events :\
       incident = nil
       MonitorEvent.where(monitor: monitor['id']).sort({date: 1}).each do |event|
         if event.status == 0
-          if incident
-            incident.events << event.id
-          else
-            # TODO: skip all the everything if we find an existing incident with an end_date
-            incident = Incident.find_or_initialize_by(monitor: event.monitor, start_date: event.date) do |incident|
-              incident.state = event.state
-              incident.events = [event.id]
-            end
-          end
+          # TODO: skip all the everything if we find an existing incident with an end_date
+          incident ||= Incident.find_or_initialize_by(monitor: event.monitor, start_date: event.date)
+          incident.add_event(event)
         else
           if incident
-            incident.events << event.id
-            incident.end_date = event.date
-            incident.milliseconds = ((incident.end_date - incident.start_date) * 1000).round
+            incident.add_event(event)
             incident.save
             incident = nil
           end
