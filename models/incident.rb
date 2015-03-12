@@ -8,6 +8,10 @@ class Incident
   field :events, type: Array, default: []  # of BSON IDs
   field :milliseconds
   
+  def self.current
+    self.where(end_date: nil).order({start_date: -1}).first
+  end
+  
   def add_event(event)
     # Don't re-add events or add UP events to a closed incident
     if events.include?(event.id) || (!ongoing? && event.up?)

@@ -125,7 +125,7 @@ post '/hooks/event' do
   local_event = MonitorEvent.create_from_pingometer(monitor['last_event'], params[:monitor_id], state_abbreviation)
   
   # Update incidents
-  last_incident = Incident.where(monitor: params[:monitor_id]).sort({start_date: -1}).first || Incident.new
+  last_incident = Incident.where(monitor: params[:monitor_id]).current || Incident.new
   last_incident.add_event(local_event)
   last_incident.save
   
