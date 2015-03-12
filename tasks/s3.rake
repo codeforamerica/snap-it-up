@@ -16,6 +16,7 @@ namespace :s3 do
         state = info[1]
         monitor_id = info[2]
         pingometer_event_id = info[4]
+        # Old format was "state-monitor-date", so try parsing the last match as a date
         begin
           date = Time.parse(pingometer_event_id)
           pingometer_event_id = nil
