@@ -121,24 +121,8 @@ post '/hooks/event' do
   end
   
   state_abbreviation = monitor_state(monitor)['state_abbreviation']
-  event_status = monitor['last_event']['type']
-  state_status = event_status != 0 ? "UP" : "DOWN"
-  event_id = monitor['last_event']['id']
   
-  # It's almost ISO8601, except it's missing the time zone :(
-  # Hopefully Pingometer will fix this, so be future proof by trying to parse before fixing.
-  event_time = Time.parse(monitor['last_event']['utc_timestamp'])
-  if !event_time.utc?
-    event_time = Time.parse("#{monitor['last_event']['utc_timestamp']}Z")
-  end
-  
-  local_event = MonitorEvent.create(
-    state: state_abbreviation,
-    monitor: params[:monitor_id],
-    status: event_status,
-    date: event_time,
-    pingometer_id: event_id
-  )
+  local_event = MonitorEvent.create_from_pingometer(monitor['last_event'], params[:monitor_id], state_abbreviation)
   
   # Update incidents
   last_incident = Incident.where(monitor: params[:monitor_id]).sort({start_date: -1}).first || Incident.new
@@ -154,8 +138,9 @@ post '/hooks/event' do
   rescue
     snapshot = File.read("public/images/unreachable.png")
   end
-  
-  file_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{state_status}-#{event_id}.png"
+
+  state_status = local_event.up? ? "UP" : "DOWN"
+  file_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{state_status}-#{local_event.pingometer_id}.png"
   url = save_snapshot(file_name, snapshot)
   
   Snapshot.create(
@@ -163,7 +148,7 @@ post '/hooks/event' do
     monitor: params[:monitor_id],
     status: state_status,
     event_id: local_event.id,
-    event_pingometer_id: event_id,
+    event_pingometer_id: local_event.pingometer_id,
     date: Time.now,
     name: file_name,
     url: url

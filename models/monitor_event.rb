@@ -10,7 +10,35 @@ class MonitorEvent
   field :date
   field :state, type: String
   
+  def self.from_pingometer(pingometer_event, monitor=nil, state=nil)
+    self.new(
+      status: pingometer_event['type'],
+      date: self.pingometer_time(pingometer_event['utc_timestamp']),
+      pingometer_id: pingometer_event['id'],
+      monitor: monitor,
+      state: state
+    )
+  end
+  
+  def self.create_from_pingometer(*args)
+    event = self.from_pingometer(*args)
+    event.save
+    event
+  end
+  
   def up?
     status != 0
+  end
+  
+  protected
+  
+  def self.pingometer_time(timestamp)
+    # It's almost ISO8601, except it's missing the time zone :(
+    # Hopefully Pingometer will fix this, so be future proof by trying to parse before fixing.
+    time = Time.parse(timestamp)
+    if !time.utc?
+      time = Time.parse("#{timestamp}Z")
+    end
+    time
   end
 end

@@ -9,22 +9,9 @@ namespace :pingometer do
       state_abbreviation = monitor_state(monitor)['state_abbreviation']
       
       PingClient.events(monitor).each do |event|
-        # It's almost ISO8601, except it's missing the time zone :(
-        # Hopefully Pingometer will fix this, so be future proof by trying to parse before fixing.
-        event_time = Time.parse(event['utc_timestamp'])
-        if !event_time.utc?
-          event_time = Time.parse("#{event['utc_timestamp']}Z")
-        end
-        
-        found = MonitorEvent.where(monitor: monitor['id'], date: event_time).exists?
-        
-        if !found
-          MonitorEvent.create(
-            state: state_abbreviation,
-            monitor: monitor['id'],
-            status: event['type'],
-            date: event_time
-          )
+        model = MonitorEvent.from_pingometer(event, monitor['id'], state_abbreviation)
+        if !MonitorEvent.where(monitor: model.monitor, date: model.date).exists?
+          model.save
         end
       end
     end
