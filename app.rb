@@ -8,8 +8,11 @@ require './lib/pagesnap.rb'
 require './lib/browserstack.rb'
 require 'aws-sdk'
 require 'httparty'
-require 'mongo'
 require './lib/helpers.rb'
+require 'mongoid'
+require './models/monitor_event.rb'
+require './models/snapshot.rb'
+require './models/incident.rb'
 
 PINGOMETER_USER = ENV['PINGOMETER_USER']
 PINGOMETER_PASS = ENV['PINGOMETER_PASS']
@@ -23,6 +26,16 @@ PAGESNAP_URL = ENV['PAGESNAP_URL']
 BROWSERSTACK_USER = ENV['BROWSERSTACK_USER']
 BROWSERSTACK_KEY = ENV['BROWSERSTACK_KEY']
 
+configure do
+  Mongoid.configure do |config|
+    config.sessions = { 
+      :default => {
+        :uri => MONGO_URI
+      }
+    }
+  end
+end
+
 Aws.config.merge!({
   credentials: Aws::Credentials.new(AWS_KEY, AWS_SECRET),
   region: AWS_REGION || 'us-east-1'
@@ -35,9 +48,6 @@ else
 end
 
 MonitorList = JSON.parse(File.read('public/data/pingometer_monitors.json'))
-
-MongoConn = Mongo::MongoClient.from_uri(MONGO_URI)
-DB = MongoConn.db(URI.parse(MONGO_URI).path.slice(1..-1))
 
 get '/' do
   # Get basic info on all monitors.
@@ -156,48 +166,13 @@ post '/hooks/event' do
   end
   
   state_abbreviation = monitor_state(monitor)['state_abbreviation']
-  event_status = monitor['last_event']['type']
-  state_status = event_status != 0 ? "UP" : "DOWN"
-  event_id = monitor['last_event']['id']
   
-  # It's almost ISO8601, except it's missing the time zone :(
-  # Hopefully Pingometer will fix this, so be future proof by trying to parse before fixing.
-  event_time = Time.parse(monitor['last_event']['utc_timestamp'])
-  if !event_time.utc?
-    event_time = Time.parse("#{monitor['last_event']['utc_timestamp']}Z")
-  end
-  
-  local_event_id = DB["monitor_events"].insert({
-    state: state_abbreviation,
-    monitor: params[:monitor_id],
-    status: event_status,
-    date: event_time,
-    pingometer_id: event_id
-  })
+  local_event = MonitorEvent.create_from_pingometer(monitor['last_event'], params[:monitor_id], state_abbreviation)
   
   # Update incidents
-  last_incident = DB["incidents"].find({monitor: params[:monitor_id]}).sort({start_date: -1}).first
-  if event_status == 0
-    if last_incident && last_incident["end_date"].nil?
-      last_incident["events"] << local_event_id
-      DB["incidents"].update({"_id" => last_incident["_id"]}, last_incident)
-    else
-      DB["incidents"].insert({
-        "monitor" => params[:monitor_id],
-        "state" => state_abbreviation,
-        "start_date" => event_time,
-        "end_date" => nil,
-        "events" => [local_event_id]
-      })
-    end
-  else
-    if last_incident && last_incident["end_date"].nil?
-      last_incident["events"] << local_event_id
-      last_incident["end_date"] = event_time
-      last_incident["milliseconds"] = ((last_incident["end_date"] - last_incident["start_date"]) * 1000).round
-      DB["incidents"].update({"_id" => last_incident["_id"]}, last_incident)
-    end
-  end
+  last_incident = Incident.where(monitor: params[:monitor_id]).current || Incident.new
+  last_incident.add_event(local_event)
+  last_incident.save
   
   page_url = monitor_url(monitor)
   
@@ -208,20 +183,21 @@ post '/hooks/event' do
   rescue
     snapshot = File.read("public/images/unreachable.png")
   end
-  
-  file_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{state_status}-#{event_id}.png"
+
+  state_status = local_event.up? ? "UP" : "DOWN"
+  file_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{state_status}-#{local_event.pingometer_id}.png"
   url = save_snapshot(file_name, snapshot)
   
-  DB["snapshots"].insert({
+  Snapshot.create(
     state: state_abbreviation,
     monitor: params[:monitor_id],
     status: state_status,
-    event_id: local_event_id,
-    event_pingometer_id: event_id,
+    event_id: local_event.id,
+    event_pingometer_id: local_event.pingometer_id,
     date: Time.now,
     name: file_name,
-    url: url,
-  })
+    url: url
+  )
   
   logger.info "Snapshot saved: #{file_name}, #{url}"
   
