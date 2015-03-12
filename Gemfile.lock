@@ -24,6 +24,8 @@ GEM
     childprocess (0.5.5)
       ffi (~> 1.0, >= 1.0.11)
     connection_pool (2.1.2)
+    faraday (0.9.1)
+      multipart-post (>= 1.2, < 3)
     ffi (1.9.6)
     httparty (0.13.3)
       json (~> 1.8)
@@ -45,6 +47,7 @@ GEM
       optionable (~> 0.2.0)
     multi_json (1.10.1)
     multi_xml (0.5.5)
+    multipart-post (2.0.0)
     optionable (0.2.0)
     origin (2.1.1)
     rack (1.6.0)
@@ -58,6 +61,8 @@ GEM
       multi_json (~> 1.0)
       rubyzip (~> 1.0)
       websocket (~> 1.0)
+    sentry-raven (0.12.3)
+      faraday (>= 0.7.6)
     sinatra (1.4.5)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -81,5 +86,6 @@ DEPENDENCIES
   mongoid (~> 4.0)
   rake
   selenium-webdriver
+  sentry-raven
   sinatra
   unicorn
