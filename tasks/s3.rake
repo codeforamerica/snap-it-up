@@ -45,7 +45,7 @@ namespace :s3 do
           db_data = {
             state: state,
             monitor: monitor_id,
-            status: monitor_event.status != 0 ? "UP" : "DOWN",
+            status: monitor_event.up? ? "UP" : "DOWN",
             event_id: monitor_event.id,
             event_pingometer_id: pingometer_event_id,
             date: date,

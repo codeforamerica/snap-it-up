@@ -9,4 +9,8 @@ class MonitorEvent
   field :status, type: Integer
   field :date
   field :state, type: String
+  
+  def up?
+    status != 0
+  end
 end

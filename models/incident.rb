@@ -10,14 +10,14 @@ class Incident
   
   def add_event(event)
     # Don't re-add events or add UP events to a closed incident
-    if events.include?(event.id) || (!ongoing? && event.status != 0)
+    if events.include?(event.id) || (!ongoing? && event.up?)
       return false
     end
     
     self.events << event.id
     
     # If unset, populate various attributes from event
-    if start_date.nil? || (event.status == 0 && event.date < start_date)
+    if start_date.nil? || (!event.up? && event.date < start_date)
       self.start_date = event.date
     end
 
@@ -30,7 +30,7 @@ class Incident
     end
     
     # Close out the incident if it's an UP event.
-    if event.status != 0
+    if event.up?
       self.end_date = event.date
       self.milliseconds = ((end_date - start_date) * 1000).round
     end
