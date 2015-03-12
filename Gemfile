@@ -6,8 +6,7 @@ gem "rack-timeout"
 gem "sinatra"
 gem "httparty"
 gem "aws-sdk"
-gem "mongo"
-gem "bson_ext"
+gem "mongoid", "~> 4.0"
 gem "rake"
 
 # For browserstack

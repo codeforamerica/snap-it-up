@@ -1,14 +1,12 @@
 namespace :s3 do
   desc 'Load snapshots metadata and save in local DB.'
   task :load_snapshots do |t|
-    db_events = DB["monitor_events"]
-    db_snapshots = DB["snapshots"]
-    
     s3 = Aws::S3::Resource.new
     s3.bucket(AWS_BUCKET).objects.each do |snapshot|
       # Check whether we already have data for this snapshot
-      snapshot_data = db_snapshots.find_one(:name => snapshot.key)
-      if snapshot_data && snapshot_data["event_id"]
+      snapshot_data = Snapshot.where(name: snapshot.key).first
+      # FIXME: do we still need to handle the situation where snapshots have no event_id?
+      if snapshot_data && snapshot_data.event_id
         next
       end
       
@@ -18,6 +16,7 @@ namespace :s3 do
         state = info[1]
         monitor_id = info[2]
         pingometer_event_id = info[4]
+        # Old format was "state-monitor-date", so try parsing the last match as a date
         begin
           date = Time.parse(pingometer_event_id)
           pingometer_event_id = nil
@@ -31,14 +30,14 @@ namespace :s3 do
         # 3. By most recent event to snapshot date + monitor match
         monitor_event = nil
         if pingometer_event_id
-          monitor_event = db_events.find_one("pingometer_id" => pingometer_event_id)
+          monitor_event = MonitorEvent.where(pingometer_id: pingometer_event_id).first
         end
         if !monitor_event
-          monitor_event = db_events.find_one("date" => date, "monitor" => monitor_id)
+          monitor_event = MonitorEvent.where(date: date, monitor: monitor_id).first
         end
         if !monitor_event
           # otherwise find the closest date...
-          monitor_event = db_events.find(:date => {"$lte" => date}, "monitor" => monitor_id).sort(:date => :desc).first
+          monitor_event = MonitorEvent.where(monitor: monitor_id, :date.lte => date).sort(:date => :desc).first
         end
         
         if !monitor_event
@@ -47,17 +46,17 @@ namespace :s3 do
           db_data = {
             state: state,
             monitor: monitor_id,
-            status: monitor_event["status"] != 0 ? "UP" : "DOWN",
-            event_id: monitor_event["_id"],
+            status: monitor_event.up? ? "UP" : "DOWN",
+            event_id: monitor_event.id,
             event_pingometer_id: pingometer_event_id,
             date: date,
             name: snapshot.key,
             url: snapshot.object.public_url,
           }
           if snapshot_data
-            db_snapshots.update({"_id" => snapshot_data["_id"]}, db_data)
+            snapshot_data.update_attributes(db_data)
           else
-            db_snapshots.insert(db_data)
+            Snapshot.create(db_data)
           end
         end
       end
