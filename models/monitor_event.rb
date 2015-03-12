@@ -10,6 +10,8 @@ class MonitorEvent
   field :date
   field :state, type: String
   
+  default_scope ->{ order({date: 1}) }
+  
   def self.from_pingometer(pingometer_event, monitor=nil, state=nil)
     self.new(
       status: pingometer_event['type'],

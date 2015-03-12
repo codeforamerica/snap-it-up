@@ -7,7 +7,7 @@ namespace :analysis do
       # Roll through events in date order and create incidents representing consecutive series of down events
       # NOTE: a lot the ifs here are necessary because sometimes we have consecutive up or down events :\
       incident = nil
-      MonitorEvent.where(monitor: monitor['id']).sort({date: 1}).each do |event|
+      MonitorEvent.where(monitor: monitor['id']).each do |event|
         if !event.up?
           # TODO: skip all the everything if we find an existing incident with an end_date
           incident ||= Incident.find_or_initialize_by(monitor: event.monitor, start_date: event.date)
