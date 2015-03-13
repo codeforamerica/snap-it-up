@@ -7,7 +7,7 @@ gem 'rails', '4.2.0'
 # Use postgresql as the database for Active Record
 gem 'pg'
 
-gem "mongoid", "~> 4.0"
+# gem "mongoid", "~> 4.0"
 gem "puma"
 gem "rack-timeout"
 
