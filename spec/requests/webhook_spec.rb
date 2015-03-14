@@ -10,12 +10,12 @@ RSpec.describe 'Pingometer Webhook', type: :request do
       monitor_status: 'down',
       utc_timestamp: '2015-03-10T13:13:19' # Pingometer uses ISO8601 but without the Z
     }
-    post '/hooks/event', pingometer_data.to_json, format: :json
+    post '/hooks/event', pingometer_data.to_json, 'Content-Type' => 'application/json'
     expect(response).to be_success
 
     # WebServices should found or be created if they don't exist
     web_service = WebService.find_by_pingometer_id monitor_id
-    expect(web_service).to exist
+    expect(web_service).to_not be_nil
 
     # A webservice without an open incident should result in
     # the creation of a new incident
@@ -36,7 +36,7 @@ RSpec.describe 'Pingometer Webhook', type: :request do
       monitor_host: 'pingometer.com',
       monitor_status: 'down'
     }
-    post '/hooks/event', pingometer_data.to_json, format: :json
+    post '/hooks/event', pingometer_data.to_json, 'Content-Type' => 'application/json'
 
     # Ensure no new incidents have been created
     web_service.reload!
@@ -54,7 +54,7 @@ RSpec.describe 'Pingometer Webhook', type: :request do
       monitor_host: 'pingometer.com',
       monitor_status: 'up'
     }
-    post '/hooks/event', pingometer_data.to_json, format: :json
+    post '/hooks/event', pingometer_data.to_json, 'Content-Type' => 'application/json'
 
     # Ensure no new incidents have been created
     web_service.reload!
@@ -72,7 +72,7 @@ RSpec.describe 'Pingometer Webhook', type: :request do
       monitor_host: 'pingometer.com',
       monitor_status: 'up'
     }
-    post '/hooks/event', pingometer_data.to_json, format: :json
+    post '/hooks/event', pingometer_data.to_json, 'Content-Type' => 'application/json'
 
     incident.reload!
     expect(incident.count).to eq 3
