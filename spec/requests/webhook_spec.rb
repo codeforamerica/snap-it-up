@@ -7,7 +7,8 @@ RSpec.describe 'Pingometer Webhook', type: :request do
     pingometer_data = {
       monitor_id: monitor_id,
       monitor_host: 'pingometer.com',
-      monitor_status: 'down' # or 'up'
+      monitor_status: 'down',
+      utc_timestamp: '2015-03-10T13:13:19' # Pingometer uses ISO8601 but without the Z
     }
     post '/hooks/event', pingometer_data.to_json, format: :json
     expect(response).to be_success
@@ -33,7 +34,7 @@ RSpec.describe 'Pingometer Webhook', type: :request do
     pingometer_data = {
       monitor_id: monitor_id,
       monitor_host: 'pingometer.com',
-      monitor_status: 'down' # or 'up'
+      monitor_status: 'down'
     }
     post '/hooks/event', pingometer_data.to_json, format: :json
 
@@ -51,7 +52,7 @@ RSpec.describe 'Pingometer Webhook', type: :request do
     pingometer_data = {
       monitor_id: monitor_id,
       monitor_host: 'pingometer.com',
-      monitor_status: 'up' # or 'up'
+      monitor_status: 'up'
     }
     post '/hooks/event', pingometer_data.to_json, format: :json
 
@@ -69,7 +70,7 @@ RSpec.describe 'Pingometer Webhook', type: :request do
     pingometer_data = {
       monitor_id: monitor_id,
       monitor_host: 'pingometer.com',
-      monitor_status: 'up' # or 'up'
+      monitor_status: 'up'
     }
     post '/hooks/event', pingometer_data.to_json, format: :json
 
