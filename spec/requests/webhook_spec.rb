@@ -24,6 +24,7 @@ RSpec.describe 'Pingometer Webhook', type: :request do
 
     # Incidents should have Events
     event = incident.monitor_events.first
+    expect(incident).to be_a MonitorEvent
     expect(event.status).to eq 'down'
 
     # TODO: ensure screenshot takes place
@@ -72,6 +73,7 @@ RSpec.describe 'Pingometer Webhook', type: :request do
     }
     post '/hooks/event', pingometer_data.to_json, format: :json
 
-    expect(Incident.count).to eq 3
+    incident.reload!
+    expect(incident.count).to eq 3
   end
 end
