@@ -17,4 +17,8 @@
 class MonitorIncident < ActiveRecord::Base
   belongs_to :web_service
   has_many :monitor_events
+
+  def open?
+    finished_at.nil?
+  end
 end

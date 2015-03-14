@@ -10,4 +10,6 @@
 
 class WebService < ActiveRecord::Base
   has_many :monitor_incidents
+
+  has_one :open_monitor_incident, -> { where(finished_at: nil).includes(:monitor_events).limit(1) }, class_name: 'MonitorIncident'
 end
