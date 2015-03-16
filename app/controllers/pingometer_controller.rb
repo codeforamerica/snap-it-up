@@ -2,7 +2,12 @@ class PingometerController < ApplicationController
   def webhook
     web_service = WebService.find_or_create_by! pingometer_id: webhook_params[:monitor_id]
     open_incident = web_service.open_monitor_incident
-    timestamp = convert_pingometer_time webhook_params[:utc_timestamp]
+
+    # refresh the Monitor data, which holds the data for last_event
+    web_service.fetch
+
+    event_data = web_service.last_event_data
+    timestamp = DateTime.parse event_data['utc_timestamp']
 
     if webhook_params[:monitor_status] == 'down'
       unless open_incident
@@ -34,15 +39,5 @@ class PingometerController < ApplicationController
     post_params.require(:monitor_status)
     post_params.require(:utc_timestamp)
     post_params
-  end
-
-  def convert_pingometer_time(timestamp)
-    # It's almost ISO8601, except it's missing the time zone :(
-    # Hopefully Pingometer will fix this, so be future proof by trying to parse before fixing.
-    time = Time.parse(timestamp.to_s)
-    if !time.utc?
-      time = Time.parse("#{timestamp}Z")
-    end
-    time
   end
 end

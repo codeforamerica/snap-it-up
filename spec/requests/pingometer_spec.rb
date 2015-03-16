@@ -15,12 +15,25 @@ RSpec.describe 'Pingometer Webhook', type: :request do
       File.new(Rails.root.join('spec', 'fixtures', 'screenshot.png'), 'r')
     }.at_least(:once)
 
+    stub_request(:get, %r(https://.*app.pingometer.com/api/v1.0/monitor/b74014410cc1236a3d0h7400))
+      .to_return(status: 200, body: {
+        "monitor" => [{
+          "hostname": "test.com",
+          "last_event" => {
+            "id"=>"54fb515919ad89639917ebe9",
+            "type"=>1,
+            "utc_timestamp"=>"2015-03-07T19:28:25.250000+00:00"
+          },
+        }]
+      }.to_json, headers: {'Content-Type' => 'application/json'})
+
     pingometer_data = {
       monitor_id: monitor_id,
       monitor_host: 'pingometer.com',
       monitor_status: 'down',
       utc_timestamp: '2015-03-10T13:13:19' # Pingometer uses ISO8601 but without the Z
     }
+
     post '/hooks/event', pingometer_data.to_json, 'Content-Type' => 'application/json'
     expect(response).to be_success
 

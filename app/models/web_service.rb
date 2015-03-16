@@ -14,6 +14,10 @@ class WebService < ActiveRecord::Base
 
   has_one :open_monitor_incident, -> { where(finished_at: nil).includes(:monitor_events).limit(1) }, class_name: 'MonitorIncident'
 
+  def last_event_data
+    raw_monitor_data['last_event']
+  end
+
   def self.fetch_monitors
     Pingometer.new.monitors.map do |monitor|
       web_service = find_or_create_by! pingometer_id: monitor['id']
@@ -22,7 +26,7 @@ class WebService < ActiveRecord::Base
     end
   end
 
-  def fetch_monitor
+  def fetch
     self.raw_monitor_data = Pingometer.new.monitor pingometer_id
     save!
   end
