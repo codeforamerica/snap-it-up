@@ -5,8 +5,8 @@ class Pingometer
   base_uri 'https://app.pingometer.com/api/v1.0'
   headers 'Accept' => 'application/json'
 
-  def initialize(user, pass)
-    @auth = {username: user, password: pass}
+  def initialize(username: ENV['PINGOMETER_USER'], password: ENV['PINGOMETER_PASS'])
+    @auth = { username: username, password: password }
   end
 
   def monitors

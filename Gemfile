@@ -15,6 +15,9 @@ gem "rack-timeout"
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
 
+gem "mini_magick"
+gem "refile", require: ["refile/rails", "refile/image_processing"]
+gem "que"
 gem "httparty"
 gem "aws-sdk"
 gem "sentry-raven"
@@ -55,6 +58,7 @@ end
 group :development, :test do
   gem 'rspec'
   gem 'rspec-rails'
+  gem 'webmock'
 
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'pry-byebug'

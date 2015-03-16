@@ -4,6 +4,17 @@ RSpec.describe 'Pingometer Webhook', type: :request do
   it 'is persisted appropriately in the database' do
     monitor_id = 'b74014410cc1236a3d0h7400'
 
+    # Expect a pre-existing monitor
+    web_service = WebService.create pingometer_id: monitor_id,
+      raw_monitor_data: {
+        'hostname': 'test.com'
+      }
+
+    # Expect a screenshot
+    expect(Browserstack).to receive(:screenshot) {
+      File.new(Rails.root.join('spec', 'fixtures', 'screenshot.png'), 'r')
+    }.at_least(:once)
+
     pingometer_data = {
       monitor_id: monitor_id,
       monitor_host: 'pingometer.com',
@@ -14,8 +25,8 @@ RSpec.describe 'Pingometer Webhook', type: :request do
     expect(response).to be_success
 
     # WebServices should found or be created if they don't exist
-    web_service = WebService.find_by_pingometer_id monitor_id
-    expect(web_service).to_not be_nil
+    # web_service = WebService.find_by_pingometer_id monitor_id
+    # expect(web_service).to_not be_nil
 
     # A webservice without an open incident should result in
     # the creation of a new incident

@@ -9,13 +9,15 @@ class PingometerController < ApplicationController
         open_incident = web_service.monitor_incidents.create! started_at: timestamp
       end
 
-      open_incident.monitor_events.create! status: webhook_params[:monitor_status],
+      event = open_incident.monitor_events.create! status: webhook_params[:monitor_status],
         triggered_at: timestamp
+      ScreenshotEvent.enqueue event.id
 
     elsif webhook_params[:monitor_status] == 'up'
       if open_incident
-        open_incident.monitor_events.create! status: webhook_params[:monitor_status],
+        event = open_incident.monitor_events.create! status: webhook_params[:monitor_status],
           triggered_at: timestamp
+        ScreenshotEvent.enqueue event.id
 
         open_incident.update! finished_at: timestamp
       end

@@ -8,6 +8,8 @@
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  triggered_at        :datetime         not null
+#  screenshot_id       :string
+#  screenshot_at       :datetime
 #
 # Indexes
 #
@@ -16,6 +18,15 @@
 
 class MonitorEvent < ActiveRecord::Base
   belongs_to :monitor_incident
+  attachment :screenshot
 
   validates :status, inclusion: { in: ['down', 'up'] }
+
+  def fetch_screenshot
+    web_service = monitor_incident.web_service
+
+    self.screenshot = Browserstack.screenshot web_service.monitor_url
+    self.screenshot_at = DateTime.now
+    save!
+  end
 end
