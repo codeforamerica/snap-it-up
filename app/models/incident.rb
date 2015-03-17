@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: monitor_incidents
+# Table name: incidents
 #
 #  id                    :integer          not null, primary key
 #  pingometer_monitor_id :integer
@@ -11,12 +11,12 @@
 #
 # Indexes
 #
-#  index_monitor_incidents_on_pingometer_monitor_id  (pingometer_monitor_id)
+#  index_incidents_on_pingometer_monitor_id  (pingometer_monitor_id)
 #
 
-class MonitorIncident < ActiveRecord::Base
-  belongs_to :web_service
-  has_many :monitor_events
+class Incident < ActiveRecord::Base
+  belongs_to :pingometer_monitor
+  has_many :pingometer_events
 
   def open?
     finished_at.nil?

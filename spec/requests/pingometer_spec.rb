@@ -6,7 +6,7 @@ RSpec.describe 'Pingometer Webhook', type: :request do
 
     # Expect a pre-existing monitor
     monitor = PingometerMonitor.create pingometer_id: monitor_id,
-      raw_monitor_data: {
+      raw_data: {
         'hostname': 'test.com'
       }
 
@@ -43,13 +43,13 @@ RSpec.describe 'Pingometer Webhook', type: :request do
 
     # A webservice without an open incident should result in
     # the creation of a new incident
-    incident = monitor.open_monitor_incident
-    expect(incident).to be_a MonitorIncident
+    incident = monitor.open_incident
+    expect(incident).to be_an Incident
     expect(incident.open?).to eq true
 
     # Incidents should have Events
-    event = incident.monitor_events.first
-    expect(event).to be_a MonitorEvent
+    event = incident.pingometer_events.first
+    expect(event).to be_a PingometerEvent
     expect(event.status).to eq 'down'
 
     # TODO: ensure screenshot takes place
@@ -65,12 +65,12 @@ RSpec.describe 'Pingometer Webhook', type: :request do
 
     # Ensure no new incidents have been created
     monitor.reload
-    expect(monitor.monitor_incidents.count).to eq 1
+    expect(monitor.incidents.count).to eq 1
 
     # Ensure that the incident's new event has been attached
     # and the incident remains open
     incident.reload
-    expect(incident.monitor_events.count).to eq 2
+    expect(incident.pingometer_events.count).to eq 2
     expect(incident.open?).to eq true
 
     # An up event will attach to the incident and close it
@@ -84,12 +84,12 @@ RSpec.describe 'Pingometer Webhook', type: :request do
 
     # Ensure no new incidents have been created
     monitor.reload
-    expect(monitor.monitor_incidents.size).to eq 1
+    expect(monitor.incidents.size).to eq 1
 
     # Ensure that the incident's new event has been attached
     # and that the incident has been closed
     incident.reload
-    expect(incident.monitor_events.size).to eq 3
+    expect(incident.pingometer_events.size).to eq 3
     expect(incident.open?).to eq false
 
     # Supsequent up events with no open incidents are discarded
@@ -102,6 +102,6 @@ RSpec.describe 'Pingometer Webhook', type: :request do
     post '/pingometer/webhook', pingometer_data.to_json, 'Content-Type' => 'application/json'
 
     incident.reload
-    expect(incident.monitor_events.size).to eq 3
+    expect(incident.pingometer_events.size).to eq 3
   end
 end

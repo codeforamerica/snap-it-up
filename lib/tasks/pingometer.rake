@@ -4,7 +4,7 @@ namespace :pingometer do
 
   desc 'Sync all monitors from Pingometer to the database'
   task :load_monitors => :environment do |t, args|
-    monitors = WebService.fetch_monitors
+    monitors = PingometerMonitor.fetch_all
     Rails.logger.info "Synced #{monitors.size} Pingometer monitors"
   end
 

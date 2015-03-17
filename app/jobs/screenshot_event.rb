@@ -1,7 +1,7 @@
 class ScreenshotEvent < Que::Job
 
   def run(event_id)
-    event = MonitorEvent.find event_id
+    event = PingometerEvent.find event_id
 
     ActiveRecord::Base.transaction do
       event.fetch_screenshot

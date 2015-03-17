@@ -27,7 +27,7 @@ BROWSERSTACK_KEY = ENV['BROWSERSTACK_KEY']
 
 configure do
   Mongoid.configure do |config|
-    config.sessions = { 
+    config.sessions = {
       :default => {
         :uri => MONGO_URI
       }
@@ -56,29 +56,29 @@ get '/' do
     @error_message = "Our status monitoring system, Pingometer, appears to be having problems."
     return erb :error
   end
-  
+
   @down = monitors
     .select {|monitor| monitor['last_event']['type'] == 0}
     .map {|monitor| monitor['name'].partition(' |')[0].downcase}
-  
+
   @state_status = {}
   @state_week_uptime = {}
   encounters = Hash.new(0)
-  
+
   monitors.each do |monitor|
     # An event type of `-1` means a monitor is paused/non-operating.
     # For now, treat that like there's no monitor at all.
     if monitor['last_event']['type'] == -1
       next
     end
-    
+
     state = monitor_state(monitor)['state'].downcase
     # We can have multiple monitors per state (e.g. California).
     # If any are down, we want to count all as down.
     if @state_status[state] != false
       @state_status[state] = monitor['last_event']['type'] != 0
     end
-    
+
     days_checked = 0
     # NOTE: no straightforward way to get the UTC date, so we convert a Time object :\
     today = Time.now.utc.to_date
@@ -98,20 +98,20 @@ get '/' do
 
     encounters[state] += 1
   end
-  
+
   erb :index
 end
 
 post '/hooks/event' do
   content_type :json
-  
+
   logger.info "Received event hook for monitor #{params[:monitor_id]}"
-  
+
   if !params[:monitor_id]
     status 400
     return { error: "No `monitor_id` included in POST." }.to_json
   end
-  
+
   begin
     monitor = Pingometer.new(PINGOMETER_USER, PINGOMETER_PASS).monitor(params[:monitor_id])
   rescue
@@ -119,18 +119,18 @@ post '/hooks/event' do
     status 500
     return { error: "Our status monitoring system, Pingometer, appears to be having problems." }.to_json
   end
-  
+
   state_abbreviation = monitor_state(monitor)['state_abbreviation']
-  
-  local_event = MonitorEvent.create_from_pingometer(monitor['last_event'], params[:monitor_id], state_abbreviation)
-  
+
+  local_event = PingometerEvent.create_from_pingometer(monitor['last_event'], params[:monitor_id], state_abbreviation)
+
   # Update incidents
   last_incident = Incident.where(monitor: params[:monitor_id]).current || Incident.new
   last_incident.add_event(local_event)
   last_incident.save
-  
+
   page_url = monitor_url(monitor)
-  
+
   logger.info "Snapshotting #{page_url}"
   snapshot = nil
   begin
@@ -142,7 +142,7 @@ post '/hooks/event' do
   state_status = local_event.up? ? "UP" : "DOWN"
   file_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{state_status}-#{local_event.pingometer_id}.png"
   url = save_snapshot(file_name, snapshot)
-  
+
   Snapshot.create(
     state: state_abbreviation,
     monitor: params[:monitor_id],
@@ -153,9 +153,9 @@ post '/hooks/event' do
     name: file_name,
     url: url
   )
-  
+
   logger.info "Snapshot saved: #{file_name}, #{url}"
-  
+
   return { url: page_url }.to_json
 end
 
@@ -176,7 +176,7 @@ def monitor_url(monitor)
     host = monitor["hostname"]
     path = monitor["path"] || ""
     query = monitor["querystring"] && !monitor["querystring"].empty? ? "?#{monitor["querystring"]}" : ""
-    
+
     "#{protocol}://#{host}#{path}#{query}"
   else
     monitor["commands"]["1"]["get"]
@@ -201,4 +201,4 @@ def save_snapshot(name, data)
     end
     nil
   end
-end 
+end

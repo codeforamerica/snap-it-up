@@ -30,45 +30,10 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: monitor_events; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: incidents; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE monitor_events (
-    id integer NOT NULL,
-    monitor_incident_id integer,
-    status character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    triggered_at timestamp without time zone NOT NULL,
-    screenshot_id character varying,
-    screenshot_at timestamp without time zone
-);
-
-
---
--- Name: monitor_events_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE monitor_events_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: monitor_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE monitor_events_id_seq OWNED BY monitor_events.id;
-
-
---
--- Name: monitor_incidents; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE monitor_incidents (
+CREATE TABLE incidents (
     id integer NOT NULL,
     pingometer_monitor_id integer,
     started_at timestamp without time zone,
@@ -79,10 +44,10 @@ CREATE TABLE monitor_incidents (
 
 
 --
--- Name: monitor_incidents_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: incidents_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE monitor_incidents_id_seq
+CREATE SEQUENCE incidents_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -91,10 +56,45 @@ CREATE SEQUENCE monitor_incidents_id_seq
 
 
 --
--- Name: monitor_incidents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: incidents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE monitor_incidents_id_seq OWNED BY monitor_incidents.id;
+ALTER SEQUENCE incidents_id_seq OWNED BY incidents.id;
+
+
+--
+-- Name: pingometer_events; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE pingometer_events (
+    id integer NOT NULL,
+    incident_id integer,
+    status character varying,
+    triggered_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    screenshot_id character varying,
+    screenshot_at timestamp without time zone
+);
+
+
+--
+-- Name: pingometer_events_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE pingometer_events_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pingometer_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE pingometer_events_id_seq OWNED BY pingometer_events.id;
 
 
 --
@@ -185,14 +185,14 @@ CREATE TABLE schema_migrations (
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY monitor_events ALTER COLUMN id SET DEFAULT nextval('monitor_events_id_seq'::regclass);
+ALTER TABLE ONLY incidents ALTER COLUMN id SET DEFAULT nextval('incidents_id_seq'::regclass);
 
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY monitor_incidents ALTER COLUMN id SET DEFAULT nextval('monitor_incidents_id_seq'::regclass);
+ALTER TABLE ONLY pingometer_events ALTER COLUMN id SET DEFAULT nextval('pingometer_events_id_seq'::regclass);
 
 
 --
@@ -210,19 +210,19 @@ ALTER TABLE ONLY que_jobs ALTER COLUMN job_id SET DEFAULT nextval('que_jobs_job_
 
 
 --
--- Name: monitor_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: incidents_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY monitor_events
-    ADD CONSTRAINT monitor_events_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY incidents
+    ADD CONSTRAINT incidents_pkey PRIMARY KEY (id);
 
 
 --
--- Name: monitor_incidents_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pingometer_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY monitor_incidents
-    ADD CONSTRAINT monitor_incidents_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY pingometer_events
+    ADD CONSTRAINT pingometer_events_pkey PRIMARY KEY (id);
 
 
 --
@@ -242,17 +242,17 @@ ALTER TABLE ONLY que_jobs
 
 
 --
--- Name: index_monitor_events_on_monitor_incident_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_incidents_on_pingometer_monitor_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_monitor_events_on_monitor_incident_id ON monitor_events USING btree (monitor_incident_id);
+CREATE INDEX index_incidents_on_pingometer_monitor_id ON incidents USING btree (pingometer_monitor_id);
 
 
 --
--- Name: index_monitor_incidents_on_pingometer_monitor_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_pingometer_events_on_incident_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_monitor_incidents_on_pingometer_monitor_id ON monitor_incidents USING btree (pingometer_monitor_id);
+CREATE INDEX index_pingometer_events_on_incident_id ON pingometer_events USING btree (incident_id);
 
 
 --
@@ -277,19 +277,19 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 
 --
--- Name: fk_rails_2f411ccc54; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_5419df78df; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY monitor_events
-    ADD CONSTRAINT fk_rails_2f411ccc54 FOREIGN KEY (monitor_incident_id) REFERENCES monitor_incidents(id);
+ALTER TABLE ONLY pingometer_events
+    ADD CONSTRAINT fk_rails_5419df78df FOREIGN KEY (incident_id) REFERENCES incidents(id);
 
 
 --
--- Name: fk_rails_cffb00e7bf; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_a24762e7f7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY monitor_incidents
-    ADD CONSTRAINT fk_rails_cffb00e7bf FOREIGN KEY (pingometer_monitor_id) REFERENCES pingometer_monitors(id);
+ALTER TABLE ONLY incidents
+    ADD CONSTRAINT fk_rails_a24762e7f7 FOREIGN KEY (pingometer_monitor_id) REFERENCES pingometer_monitors(id);
 
 
 --
@@ -303,8 +303,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150313183143');
 INSERT INTO schema_migrations (version) VALUES ('20150313183904');
 
 INSERT INTO schema_migrations (version) VALUES ('20150313183947');
-
-INSERT INTO schema_migrations (version) VALUES ('20150314023409');
 
 INSERT INTO schema_migrations (version) VALUES ('20150315164502');
 

@@ -16,29 +16,28 @@
 #
 
 class PingometerMonitor < ActiveRecord::Base
-  has_many :monitor_incidents
-
-  has_one :open_monitor_incident, -> { where(finished_at: nil).includes(:monitor_events).limit(1) }, class_name: 'MonitorIncident'
+  has_many :incidents
+  has_one :open_incident, -> { where(finished_at: nil).includes(:pingometer_events).limit(1) }, class_name: 'Incident'
 
   def last_event_data
-    raw_monitor_data['last_event']
+    raw_data['last_event']
   end
 
-  def self.fetch_monitors
+  def self.fetch_all
     Pingometer.new.monitors.map do |monitor|
       web_service = find_or_create_by! pingometer_id: monitor['id']
-      web_service.raw_monitor_data = monitor
+      web_service.raw_data = monitor
       web_service.save!
     end
   end
 
   def fetch
-    self.raw_monitor_data = Pingometer.new.monitor pingometer_id
+    self.raw_data = Pingometer.new.monitor pingometer_id
     save!
   end
 
-  def monitor_url
-    monitor = raw_monitor_data
+  def url
+    monitor = raw_data
 
     if monitor["hostname"] && !monitor["hostname"].empty?
       protocol = monitor['type'] && !monitor['type'].empty? ? monitor["type"] : "http"
