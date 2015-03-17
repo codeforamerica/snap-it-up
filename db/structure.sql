@@ -70,7 +70,7 @@ ALTER SEQUENCE monitor_events_id_seq OWNED BY monitor_events.id;
 
 CREATE TABLE monitor_incidents (
     id integer NOT NULL,
-    web_service_id integer,
+    pingometer_monitor_id integer,
     started_at timestamp without time zone,
     finished_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
@@ -95,6 +95,39 @@ CREATE SEQUENCE monitor_incidents_id_seq
 --
 
 ALTER SEQUENCE monitor_incidents_id_seq OWNED BY monitor_incidents.id;
+
+
+--
+-- Name: pingometer_monitors; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE pingometer_monitors (
+    id integer NOT NULL,
+    pingometer_id character varying,
+    hostname character varying,
+    raw_data jsonb,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: pingometer_monitors_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE pingometer_monitors_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pingometer_monitors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE pingometer_monitors_id_seq OWNED BY pingometer_monitors.id;
 
 
 --
@@ -149,38 +182,6 @@ CREATE TABLE schema_migrations (
 
 
 --
--- Name: web_services; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE web_services (
-    id integer NOT NULL,
-    pingometer_id character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    raw_monitor_data jsonb
-);
-
-
---
--- Name: web_services_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE web_services_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: web_services_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE web_services_id_seq OWNED BY web_services.id;
-
-
---
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -195,17 +196,17 @@ ALTER TABLE ONLY monitor_incidents ALTER COLUMN id SET DEFAULT nextval('monitor_
 
 
 --
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY pingometer_monitors ALTER COLUMN id SET DEFAULT nextval('pingometer_monitors_id_seq'::regclass);
+
+
+--
 -- Name: job_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY que_jobs ALTER COLUMN job_id SET DEFAULT nextval('que_jobs_job_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY web_services ALTER COLUMN id SET DEFAULT nextval('web_services_id_seq'::regclass);
 
 
 --
@@ -225,19 +226,19 @@ ALTER TABLE ONLY monitor_incidents
 
 
 --
+-- Name: pingometer_monitors_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY pingometer_monitors
+    ADD CONSTRAINT pingometer_monitors_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: que_jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY que_jobs
     ADD CONSTRAINT que_jobs_pkey PRIMARY KEY (queue, priority, run_at, job_id);
-
-
---
--- Name: web_services_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY web_services
-    ADD CONSTRAINT web_services_pkey PRIMARY KEY (id);
 
 
 --
@@ -248,10 +249,24 @@ CREATE INDEX index_monitor_events_on_monitor_incident_id ON monitor_events USING
 
 
 --
--- Name: index_monitor_incidents_on_web_service_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_monitor_incidents_on_pingometer_monitor_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_monitor_incidents_on_web_service_id ON monitor_incidents USING btree (web_service_id);
+CREATE INDEX index_monitor_incidents_on_pingometer_monitor_id ON monitor_incidents USING btree (pingometer_monitor_id);
+
+
+--
+-- Name: index_pingometer_monitors_on_hostname; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_pingometer_monitors_on_hostname ON pingometer_monitors USING btree (hostname);
+
+
+--
+-- Name: index_pingometer_monitors_on_pingometer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_pingometer_monitors_on_pingometer_id ON pingometer_monitors USING btree (pingometer_id);
 
 
 --
@@ -262,19 +277,19 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 
 --
--- Name: fk_rails_7a10c2cc3e; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY monitor_incidents
-    ADD CONSTRAINT fk_rails_7a10c2cc3e FOREIGN KEY (web_service_id) REFERENCES web_services(id);
-
-
---
--- Name: fk_rails_ca67ea612a; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_2f411ccc54; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY monitor_events
-    ADD CONSTRAINT fk_rails_ca67ea612a FOREIGN KEY (monitor_incident_id) REFERENCES monitor_incidents(id);
+    ADD CONSTRAINT fk_rails_2f411ccc54 FOREIGN KEY (monitor_incident_id) REFERENCES monitor_incidents(id);
+
+
+--
+-- Name: fk_rails_cffb00e7bf; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY monitor_incidents
+    ADD CONSTRAINT fk_rails_cffb00e7bf FOREIGN KEY (pingometer_monitor_id) REFERENCES pingometer_monitors(id);
 
 
 --
@@ -294,6 +309,4 @@ INSERT INTO schema_migrations (version) VALUES ('20150314023409');
 INSERT INTO schema_migrations (version) VALUES ('20150315164502');
 
 INSERT INTO schema_migrations (version) VALUES ('20150315205949');
-
-INSERT INTO schema_migrations (version) VALUES ('20150315210808');
 

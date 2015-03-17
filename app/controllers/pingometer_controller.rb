@@ -1,17 +1,17 @@
 class PingometerController < ApplicationController
   def webhook
-    web_service = WebService.find_or_create_by! pingometer_id: webhook_params[:monitor_id]
+    monitor = PingMonitor.find_or_create_by! pingometer_id: webhook_params[:monitor_id]
     open_incident = web_service.open_monitor_incident
 
     # refresh the Monitor data, which holds the data for last_event
-    web_service.fetch
+    monitor.fetch
 
-    event_data = web_service.last_event_data
+    event_data = monitor.last_event_data
     timestamp = DateTime.parse event_data['utc_timestamp']
 
     if webhook_params[:monitor_status] == 'down'
       unless open_incident
-        open_incident = web_service.monitor_incidents.create! started_at: timestamp
+        open_incident = monitor.monitor_incidents.create! started_at: timestamp
       end
 
       event = open_incident.monitor_events.create! status: webhook_params[:monitor_status],

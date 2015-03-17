@@ -1,15 +1,21 @@
 # == Schema Information
 #
-# Table name: web_services
+# Table name: pingometer_monitors
 #
-#  id               :integer          not null, primary key
-#  pingometer_id    :string
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  raw_monitor_data :jsonb
+#  id            :integer          not null, primary key
+#  pingometer_id :string
+#  hostname      :string
+#  raw_data      :jsonb
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#
+# Indexes
+#
+#  index_pingometer_monitors_on_hostname       (hostname) UNIQUE
+#  index_pingometer_monitors_on_pingometer_id  (pingometer_id) UNIQUE
 #
 
-class WebService < ActiveRecord::Base
+class PingometerMonitor < ActiveRecord::Base
   has_many :monitor_incidents
 
   has_one :open_monitor_incident, -> { where(finished_at: nil).includes(:monitor_events).limit(1) }, class_name: 'MonitorIncident'

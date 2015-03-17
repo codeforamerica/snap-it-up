@@ -5,7 +5,7 @@ RSpec.describe 'Pingometer Webhook', type: :request do
     monitor_id = 'b74014410cc1236a3d0h7400'
 
     # Expect a pre-existing monitor
-    web_service = WebService.create pingometer_id: monitor_id,
+    monitor = PingometerMonitor.create pingometer_id: monitor_id,
       raw_monitor_data: {
         'hostname': 'test.com'
       }
@@ -34,16 +34,16 @@ RSpec.describe 'Pingometer Webhook', type: :request do
       utc_timestamp: '2015-03-10T13:13:19' # Pingometer uses ISO8601 but without the Z
     }
 
-    post '/hooks/event', pingometer_data.to_json, 'Content-Type' => 'application/json'
+    post '/pingometer/webhook', pingometer_data.to_json, 'Content-Type' => 'application/json'
     expect(response).to be_success
 
     # WebServices should found or be created if they don't exist
-    # web_service = WebService.find_by_pingometer_id monitor_id
-    # expect(web_service).to_not be_nil
+    # monitor = WebService.find_by_pingometer_id monitor_id
+    # expect(monitor).to_not be_nil
 
     # A webservice without an open incident should result in
     # the creation of a new incident
-    incident = web_service.open_monitor_incident
+    incident = monitor.open_monitor_incident
     expect(incident).to be_a MonitorIncident
     expect(incident.open?).to eq true
 
@@ -61,11 +61,11 @@ RSpec.describe 'Pingometer Webhook', type: :request do
       monitor_status: 'down',
       utc_timestamp: '2015-03-10T13:14:19'
     }
-    post '/hooks/event', pingometer_data.to_json, 'Content-Type' => 'application/json'
+    post '/pingometer/webhook', pingometer_data.to_json, 'Content-Type' => 'application/json'
 
     # Ensure no new incidents have been created
-    web_service.reload
-    expect(web_service.monitor_incidents.count).to eq 1
+    monitor.reload
+    expect(monitor.monitor_incidents.count).to eq 1
 
     # Ensure that the incident's new event has been attached
     # and the incident remains open
@@ -80,11 +80,11 @@ RSpec.describe 'Pingometer Webhook', type: :request do
       monitor_status: 'up',
       utc_timestamp: '2015-03-10T13:16:19'
     }
-    post '/hooks/event', pingometer_data.to_json, 'Content-Type' => 'application/json'
+    post '/pingometer/webhook', pingometer_data.to_json, 'Content-Type' => 'application/json'
 
     # Ensure no new incidents have been created
-    web_service.reload
-    expect(web_service.monitor_incidents.size).to eq 1
+    monitor.reload
+    expect(monitor.monitor_incidents.size).to eq 1
 
     # Ensure that the incident's new event has been attached
     # and that the incident has been closed
@@ -99,7 +99,7 @@ RSpec.describe 'Pingometer Webhook', type: :request do
       monitor_status: 'up',
       utc_timestamp: '2015-03-10T13:17:19'
     }
-    post '/hooks/event', pingometer_data.to_json, 'Content-Type' => 'application/json'
+    post '/pingometer/webhook', pingometer_data.to_json, 'Content-Type' => 'application/json'
 
     incident.reload
     expect(incident.monitor_events.size).to eq 3
