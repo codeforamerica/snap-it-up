@@ -52,6 +52,11 @@ RSpec.describe 'Pingometer Webhook', type: :request do
     expect(event).to be_a PingometerEvent
     expect(event.status).to eq 'down'
 
+    # Events should have screenshots
+    screenshot = event.screenshot
+    expect(screenshot).to be_a Screenshot
+    expect(screenshot.image).to_not be_nil
+
     # TODO: ensure screenshot takes place
 
     # Subsequent down events should spool onto the existing open incident

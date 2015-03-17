@@ -4,7 +4,9 @@ class ScreenshotEvent < Que::Job
     event = PingometerEvent.find event_id
 
     ActiveRecord::Base.transaction do
-      event.fetch_screenshot
+      screenshot = event.build_screenshot
+      screenshot.fetch
+      screenshot.save!
       destroy
     end
   rescue ActiveRecord::RecordNotFound

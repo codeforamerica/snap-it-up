@@ -72,9 +72,7 @@ CREATE TABLE pingometer_events (
     status character varying,
     triggered_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    screenshot_id character varying,
-    screenshot_at timestamp without time zone
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -182,6 +180,39 @@ CREATE TABLE schema_migrations (
 
 
 --
+-- Name: screenshots; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE screenshots (
+    id integer NOT NULL,
+    pingometer_monitor_id integer,
+    pingometer_event_id integer,
+    image_id character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: screenshots_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE screenshots_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: screenshots_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE screenshots_id_seq OWNED BY screenshots.id;
+
+
+--
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -207,6 +238,13 @@ ALTER TABLE ONLY pingometer_monitors ALTER COLUMN id SET DEFAULT nextval('pingom
 --
 
 ALTER TABLE ONLY que_jobs ALTER COLUMN job_id SET DEFAULT nextval('que_jobs_job_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY screenshots ALTER COLUMN id SET DEFAULT nextval('screenshots_id_seq'::regclass);
 
 
 --
@@ -242,6 +280,14 @@ ALTER TABLE ONLY que_jobs
 
 
 --
+-- Name: screenshots_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY screenshots
+    ADD CONSTRAINT screenshots_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: index_incidents_on_pingometer_monitor_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -270,6 +316,20 @@ CREATE UNIQUE INDEX index_pingometer_monitors_on_pingometer_id ON pingometer_mon
 
 
 --
+-- Name: index_screenshots_on_pingometer_event_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_screenshots_on_pingometer_event_id ON screenshots USING btree (pingometer_event_id);
+
+
+--
+-- Name: index_screenshots_on_pingometer_monitor_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_screenshots_on_pingometer_monitor_id ON screenshots USING btree (pingometer_monitor_id);
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -277,19 +337,35 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 
 --
--- Name: fk_rails_5419df78df; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_1b2f0e27d7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY pingometer_events
-    ADD CONSTRAINT fk_rails_5419df78df FOREIGN KEY (incident_id) REFERENCES incidents(id);
+    ADD CONSTRAINT fk_rails_1b2f0e27d7 FOREIGN KEY (incident_id) REFERENCES incidents(id);
 
 
 --
--- Name: fk_rails_a24762e7f7; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_563166f18d; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY incidents
-    ADD CONSTRAINT fk_rails_a24762e7f7 FOREIGN KEY (pingometer_monitor_id) REFERENCES pingometer_monitors(id);
+    ADD CONSTRAINT fk_rails_563166f18d FOREIGN KEY (pingometer_monitor_id) REFERENCES pingometer_monitors(id);
+
+
+--
+-- Name: fk_rails_5fed216f41; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY screenshots
+    ADD CONSTRAINT fk_rails_5fed216f41 FOREIGN KEY (pingometer_monitor_id) REFERENCES pingometer_monitors(id);
+
+
+--
+-- Name: fk_rails_6106f70d23; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY screenshots
+    ADD CONSTRAINT fk_rails_6106f70d23 FOREIGN KEY (pingometer_event_id) REFERENCES pingometer_events(id);
 
 
 --
@@ -306,5 +382,5 @@ INSERT INTO schema_migrations (version) VALUES ('20150313183947');
 
 INSERT INTO schema_migrations (version) VALUES ('20150315164502');
 
-INSERT INTO schema_migrations (version) VALUES ('20150315205949');
+INSERT INTO schema_migrations (version) VALUES ('20150317143922');
 

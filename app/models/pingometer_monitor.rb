@@ -17,7 +17,9 @@
 
 class PingometerMonitor < ActiveRecord::Base
   has_many :incidents
+  has_many :screenshots
   has_one :open_incident, -> { where(finished_at: nil).includes(:pingometer_events).limit(1) }, class_name: 'Incident'
+
 
   def last_event_data
     raw_data['last_event']
