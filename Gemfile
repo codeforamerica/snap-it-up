@@ -19,7 +19,7 @@ gem "mini_magick"
 gem "refile", require: ["refile/rails", "refile/image_processing"]
 gem "que"
 gem "httparty"
-gem "aws-sdk"
+gem "aws-sdk", '< 2'
 gem 'pry-rails'
 
 # For browserstack
