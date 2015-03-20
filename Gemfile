@@ -8,6 +8,7 @@ gem "httparty"
 gem "aws-sdk"
 gem "mongoid", "~> 4.0"
 gem "rake"
+gem "sentry-raven"
 
 # For browserstack
 gem "selenium-webdriver"

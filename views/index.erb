@@ -2,10 +2,6 @@
 <html>
 <head>
   <style type="text/css">
-    html, body {
-      margin: 0;
-    }
-    
     .map {
       width: 100%;
     }
@@ -38,18 +34,28 @@
       paint-order: stroke;
     }
   </style>
+  <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen">
 
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="http://d3js.org/queue.v1.min.js"></script>
   <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <%= erb :'shared/_fonts' %>
 </head>
 <body>
-  <h1>Current Status</h1>
+  <header id="site-intro">
+    <h1>SNAP-it-up</h1>
+    <p>
+      SNAP (Supplemental Nutrition Assistance Program—food aid) services can be critical for those who receive them. However, the online sites and tools related to these services are often down or unavailable. Check here to see the current status and performance of SNAP sites across the country.
+    </p>
+  </header>
+  
   <svg id="map" class="map" viewBox="0 0 960 500"></svg>
   
-  <h1>Uptime over the past week</h1>
-  <svg id="uptime-map" class="map" viewBox="0 0 960 500"></svg>
-  
+  <section>
+    <h2>Uptime over the past week</h2>
+    <svg id="uptime-map" class="map" viewBox="0 0 960 500"></svg>
+  </section>
+
   <script type="application/javascript">
   // Shamelessly stolen from http://bl.ocks.org/mbostock/4342045
   var currentStatusSVG = d3.select("#map");
