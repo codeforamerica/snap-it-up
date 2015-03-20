@@ -1,0 +1,31 @@
+html, body {
+  margin: 1em 2em;
+  font-family: "brandon-grotesque", sans-serif;
+}
+
+#site-intro {
+  margin: 0 0 1em;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+#site-intro h1 {
+  margin: 0 1.5em 0 0;
+  padding: 0;
+  font-size: 3em;
+  -webkit-flex-shrink: 0;
+  flex-shrink: 0;
+}
+
+#site-intro p {
+  margin: 0;
+  padding: 0.7em 0 0;
+  max-width: 58em;
+  
+  -webkit-flex: 1 28em;
+  flex: 1 28em;
+}
