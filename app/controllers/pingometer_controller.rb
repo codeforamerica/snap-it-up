@@ -1,4 +1,6 @@
 class PingometerController < ApplicationController
+  skip_before_action :verify_authenticity_token
+
   def webhook
     monitor = PingometerMonitor.find_or_create_by! pingometer_id: webhook_params[:monitor_id]
     open_incident = monitor.open_incident

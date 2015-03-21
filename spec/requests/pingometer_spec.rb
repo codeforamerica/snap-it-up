@@ -1,6 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe 'Pingometer Webhook', type: :request do
+  before :each do
+    ActionController::Base.allow_forgery_protection = true
+  end
+
+  after :each do
+    ActionController::Base.allow_forgery_protection = false
+  end
+
   it 'is persisted appropriately in the database' do
     monitor_id = 'b74014410cc1236a3d0h7400'
 
