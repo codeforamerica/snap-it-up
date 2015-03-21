@@ -67,6 +67,10 @@ html, body {
 }
 
 /* STATE PAGE SPECIFIC */
+.heading-link {
+  font-size: 0.5em;
+}
+
 .status-unknown .status {
   color: #999;
 }
@@ -85,7 +89,21 @@ html, body {
 .snapshots li {
   display: inline-block;
 }
+.snapshots a {
+  width: 200px;
+  min-height: 100px;
+}
 .snapshots a,
 .snapshots img {
   display: block;
+}
+
+.service-portal-heading {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.service-portal-description {
+  margin-top: 0;
+  padding-top: 0;
 }

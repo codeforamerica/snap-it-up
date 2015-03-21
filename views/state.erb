@@ -1,11 +1,11 @@
 <% content_for :title do %><%= state %><% end %>
 
 <% content_for :body do %>
-  <h1><%= state %></h1>
+  <h1><%= state %> <a href="/" class="heading-link">(See all states)</a></h1>
   
   <% monitors.each do |monitor| %>
-    <section id="state-<%= monitor[:meta]["state_abbreviation"] %>" class="status-<%= monitor[:status] %>">
-      <h2>
+    <section id="state-<%= monitor[:meta]["state_abbreviation"] %>" class="service-portal status-<%= monitor[:status] %>">
+      <h2 class="service-portal-heading">
         <%= monitor[:name] %> - 
         <span class="status">
           <% if monitor[:status] == :unknown %>
@@ -17,21 +17,43 @@
           <% end %>
         </span>
       </h2>
-      <p><a href="<%= monitor[:url] %>"><%= monitor[:url] %></a></p>
+      <p class="service-portal-description"><a href="<%= monitor[:url] %>"><%= monitor[:url] %></a></p>
       
-      Most recent snapshots:
-      <ol class="snapshots">
-      <% monitor[:snapshots].slice(0, 10).each do |snapshot, index| %>
-        <li>
-          <a href="<%= snapshot.url %>">
-            <img src="<%= snapshot.render_url({w: 200}) %>" alt="" />
-            <%= snapshot.date.getlocal.strftime("%Y-%m-%d %I:%M %P") %>
-          </a>
-        </li>
-      <% end %>
-      </ol>
-      <% if monitor[:snapshots].count > 10 %>
-        …and <%= monitor[:snapshots].count - 10 %> more.
+      <% if monitor[:snapshots].count == 0 %>
+        No snapshots.
+      <% else %>
+        <% if monitor[:snapshots_down].count == 0 %>
+          No snapshots when the site was down.
+        <% else %>
+          Recent snapshots when the site was down:
+          <ol class="snapshots">
+            <% monitor[:snapshots_down].slice(0, 20).each do |snapshot| %>
+              <li>
+                <a href="<%= snapshot.url %>">
+                  <img src="<%= snapshot.render_url({w: 200}) %>"
+                       alt="Taken on <%= snapshot.date.getlocal.strftime("%Y-%m-%d %I:%M %P") %>" />
+                </a>
+              </li>
+            <% end %>
+          </ol>
+        <% end %>
+
+
+        <% if monitor[:snapshots_up].count == 0 %>
+          No snapshots when the site was up.
+        <% else %>
+          Recent snapshots when the site was up:
+          <ol class="snapshots">
+            <% monitor[:snapshots_up].slice(0, 20).each do |snapshot| %>
+              <li>
+                <a href="<%= snapshot.url %>">
+                  <img src="<%= snapshot.render_url({w: 200}) %>"
+                       alt="Taken on <%= snapshot.date.getlocal.strftime("%Y-%m-%d %I:%M %P") %>" />
+                </a>
+              </li>
+            <% end %>
+          </ol>
+        <% end %>
       <% end %>
     </section>
   <% end %>
