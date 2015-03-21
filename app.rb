@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'sinatra/content_for'
 require 'net/https'
 require 'uri'
 require 'json'

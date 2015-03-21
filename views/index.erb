@@ -1,47 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <style type="text/css">
-    .map {
-      width: 100%;
-    }
-    
-    .states {
-      fill: transparent;
-      stroke: #fff;
-    }
-    
-/*    .state {
-      cursor: pointer;
-    }*/
-
-    .state-down {
-      fill: #FF5200;
-    }
-
-    .state-up {
-      fill: #B1CCE8;
-    }
-    
-    .uptime-label {
-      fill: #fff;
-      text-anchor: middle;
-      font-family: helvetica, arial, sans-serif;
-      font-size: 1em;
-      stroke: #869BB0;
-      stroke-width: 2;
-      stroke-opacity: 0.75;
-      paint-order: stroke;
-    }
-  </style>
-  <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen">
-
-  <script src="http://d3js.org/d3.v3.min.js"></script>
-  <script src="http://d3js.org/queue.v1.min.js"></script>
-  <script src="http://d3js.org/topojson.v1.min.js"></script>
-  <%= erb :'shared/_fonts' %>
-</head>
-<body>
+<% content_for :body do %>
   <header id="site-intro">
     <h1>SNAP-it-up</h1>
     <p>
@@ -55,8 +12,10 @@
     <h2>Uptime over the past week</h2>
     <svg id="uptime-map" class="map" viewBox="0 0 960 500"></svg>
   </section>
+<% end %>
 
-  <script type="application/javascript">
+<% content_for :extra_scripts do %>
+<script type="application/javascript">
   // Shamelessly stolen from http://bl.ocks.org/mbostock/4342045
   var currentStatusSVG = d3.select("#map");
 
@@ -198,6 +157,7 @@
     "56": { id: "56", name: "Wyoming", abbreviation: "WY" }
   };
 
-  </script>
-</body>
-</html>
+</script>
+<% end %>
+
+<%= erb :'layouts/app' %>

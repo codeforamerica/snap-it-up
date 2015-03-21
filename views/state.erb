@@ -1,33 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title><%= state %></title>
-  <style type="text/css" media="screen">
-  .status-unknown .status {
-    color: #999;
-  }
-  .status-down .status {
-    color: #FF5200;
-  }
-  .status-up .status {
-    color: #B1CCE8;
-  }
-  
-  .snapshots {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-  }
-  .snapshots li {
-    display: inline-block;
-  }
-  .snapshots a,
-  .snapshots img {
-    display: block;
-  }
-  </style>
-</head>
-<body>
+<% content_for :title do %><%= state %><% end %>
+
+<% content_for :body do %>
   <h1><%= state %></h1>
   
   <% monitors.each do |monitor| %>
@@ -62,6 +35,6 @@
       <% end %>
     </section>
   <% end %>
-  
-</body>
-</html>
+<% end %>
+
+<%= erb :'layouts/app' %>
