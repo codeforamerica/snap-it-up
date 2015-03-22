@@ -14,5 +14,6 @@ on_worker_boot do
     config = ActiveRecord::Base.configurations[Rails.env] || Rails.application.config.database_configuration[Rails.env]
     config['pool'] = threads_count + Que.worker_count
     ActiveRecord::Base.establish_connection(config)
+    Que.mode = :async
   end
 end
