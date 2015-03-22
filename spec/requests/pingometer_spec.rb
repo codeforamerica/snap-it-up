@@ -37,9 +37,8 @@ RSpec.describe 'Pingometer Webhook', type: :request do
 
     pingometer_data = {
       monitor_id: monitor_id,
-      monitor_host: 'pingometer.com',
-      monitor_status: 'down',
-      utc_timestamp: '2015-03-10T13:13:19' # Pingometer uses ISO8601 but without the Z
+      monitor_status: '0',
+      monitor_name: "Virgina | CommonHelp"
     }
 
     post '/pingometer/webhook', pingometer_data.to_json, 'Content-Type' => 'application/json'
@@ -70,9 +69,8 @@ RSpec.describe 'Pingometer Webhook', type: :request do
     # Subsequent down events should spool onto the existing open incident
     pingometer_data = {
       monitor_id: monitor_id,
-      monitor_host: 'pingometer.com',
-      monitor_status: 'down',
-      utc_timestamp: '2015-03-10T13:14:19'
+      monitor_status: '0',
+      monitor_name: "Virgina | CommonHelp"
     }
     post '/pingometer/webhook', pingometer_data.to_json, 'Content-Type' => 'application/json'
 
@@ -89,9 +87,8 @@ RSpec.describe 'Pingometer Webhook', type: :request do
     # An up event will attach to the incident and close it
     pingometer_data = {
       monitor_id: monitor_id,
-      monitor_host: 'pingometer.com',
-      monitor_status: 'up',
-      utc_timestamp: '2015-03-10T13:16:19'
+      monitor_status: '1',
+      monitor_name: "Virgina | CommonHelp"
     }
     post '/pingometer/webhook', pingometer_data.to_json, 'Content-Type' => 'application/json'
 
@@ -108,9 +105,8 @@ RSpec.describe 'Pingometer Webhook', type: :request do
     # Supsequent up events with no open incidents are discarded
     pingometer_data = {
       monitor_id: monitor_id,
-      monitor_host: 'pingometer.com',
-      monitor_status: 'up',
-      utc_timestamp: '2015-03-10T13:17:19'
+      monitor_status: '1',
+      monitor_name: "Virgina | CommonHelp"
     }
     post '/pingometer/webhook', pingometer_data.to_json, 'Content-Type' => 'application/json'
 

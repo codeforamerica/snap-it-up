@@ -11,18 +11,18 @@ class PingometerController < ApplicationController
     event_data = monitor.last_event_data
     timestamp = DateTime.parse event_data['utc_timestamp']
 
-    if webhook_params[:monitor_status] == 'down'
+    if webhook_params[:monitor_status] == '0'
       unless open_incident
         open_incident = monitor.incidents.create! started_at: timestamp
       end
 
-      event = open_incident.pingometer_events.create! status: webhook_params[:monitor_status],
+      event = open_incident.pingometer_events.create! status: 'down',
         triggered_at: timestamp
       ScreenshotEvent.enqueue event.id
 
-    elsif webhook_params[:monitor_status] == 'up'
+    elsif webhook_params[:monitor_status] == '1'
       if open_incident
-        event = open_incident.pingometer_events.create! status: webhook_params[:monitor_status],
+        event = open_incident.pingometer_events.create! status: 'up',
           triggered_at: timestamp
         ScreenshotEvent.enqueue event.id
 
