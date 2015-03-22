@@ -36,9 +36,6 @@ class PingometerController < ApplicationController
   private
 
   def webhook_params
-    post_params = params.require(:pingometer).permit :monitor_id, :monitor_status
-    post_params.require(:monitor_id)
-    post_params.require(:monitor_status)
-    post_params
+    params.permit :monitor_id, :monitor_status
   end
 end
