@@ -73,7 +73,13 @@ get '/' do
       next
     end
     
-    state = monitor_state(monitor)['state'].downcase
+    # skip if we can't figure out what state this is
+    state_data = monitor_state(monitor)
+    if state_data.nil?
+      next
+    end
+    
+    state = state_data['state'].downcase
     # We can have multiple monitors per state (e.g. California).
     # If any are down, we want to count all as down.
     if @state_status[state] != false
