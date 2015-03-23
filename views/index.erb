@@ -1,43 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <style type="text/css">
-    .map {
-      width: 100%;
-    }
-    
-    .states {
-      fill: transparent;
-      stroke: #fff;
-    }
-
-    .state-down {
-      fill: #FF5200;
-    }
-
-    .state-up {
-      fill: #B1CCE8;
-    }
-    
-    .uptime-label {
-      fill: #fff;
-      text-anchor: middle;
-      font-family: helvetica, arial, sans-serif;
-      font-size: 1em;
-      stroke: #869BB0;
-      stroke-width: 2;
-      stroke-opacity: 0.75;
-      paint-order: stroke;
-    }
-  </style>
-  <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen">
-
-  <script src="http://d3js.org/d3.v3.min.js"></script>
-  <script src="http://d3js.org/queue.v1.min.js"></script>
-  <script src="http://d3js.org/topojson.v1.min.js"></script>
-  <%= erb :'shared/_fonts' %>
-</head>
-<body>
+<% content_for :body do %>
   <header id="site-intro">
     <h1>SNAP-it-up</h1>
     <p>
@@ -51,8 +12,10 @@
     <h2>Uptime over the past week</h2>
     <svg id="uptime-map" class="map" viewBox="0 0 960 500"></svg>
   </section>
+<% end %>
 
-  <script type="application/javascript">
+<% content_for :extra_scripts do %>
+<script type="application/javascript">
   // Shamelessly stolen from http://bl.ocks.org/mbostock/4342045
   var currentStatusSVG = d3.select("#map");
 
@@ -68,13 +31,16 @@
       .selectAll("path")
         .data(topojson.feature(json, json.objects.states).features)
         .enter()
+          .append("a")
+          .attr("xlink:href", function(d) { return statesByCode[d.id] ? ("/states/" + statesByCode[d.id].abbreviation) : "#"; })
           .append("path")
           .attr("class", function(d) {
             var stateName = statesByCode[d.id] && statesByCode[d.id].name.toLowerCase();
+            var statusClass = "state-unknown";
             if (stateName in stateStatus) {
-              return stateStatus[stateName] ? "state-up" : "state-down";
+              statusClass = stateStatus[stateName] ? "state-up" : "state-down";
             }
-            return "state-unknown";
+            return "state " + statusClass;
           })
           .attr("id", function(d) { return "state-" + d.id; })
           .attr("d", path);
@@ -93,6 +59,8 @@
       .selectAll("path")
         .data(topojson.feature(json, json.objects.states).features)
         .enter()
+          .append("a")
+          .attr("xlink:href", function(d) { return statesByCode[d.id] ? ("/states/" + statesByCode[d.id].abbreviation) : "#"; })
           .append("path")
           .attr("fill", function(d) {
             var stateName = statesByCode[d.id] && statesByCode[d.id].name.toLowerCase();
@@ -103,13 +71,18 @@
             return "";
           })
           .attr("id", function(d) { return "state-" + d.id; })
-          .attr("d", path);
+          .attr("d", path)
+          // .on("click", function(d) {
+          //   window.location = "/states/" + statesByCode[d.id].abbreviation;
+          // });
           
     uptimeSVG.append("g")
       .attr("class", "labels")
       .selectAll("text")
         .data(topojson.feature(json, json.objects.states).features)
         .enter()
+          .append("a")
+          .attr("xlink:href", function(d) { return statesByCode[d.id] ? ("/states/" + statesByCode[d.id].abbreviation) : "#"; })
           .append("text")
           .attr("class", "uptime-label")
           .attr("x", function(d) {
@@ -184,6 +157,7 @@
     "56": { id: "56", name: "Wyoming", abbreviation: "WY" }
   };
 
-  </script>
-</body>
-</html>
+</script>
+<% end %>
+
+<%= erb :'layouts/app' %>

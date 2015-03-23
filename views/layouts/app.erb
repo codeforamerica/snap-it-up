@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"> 
+  <title><%= content_for?(:scripts) ? yield_content(:title) : 'SNAP Status' %><%= PRODUCTION ? '' : ' (development)'%></title>
+  <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen">
+  <%= erb :'shared/_fonts' %>
+</head>
+<body>
+  <%= yield_content :body %>
+  <% if content_for?(:scripts) %><%= yield(:scripts) %><% else %>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <%= yield_content :extra_scripts %>
+  <% end %>
+</body>
+</html>

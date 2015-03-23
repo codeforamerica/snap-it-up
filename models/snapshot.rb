@@ -13,4 +13,17 @@ class Snapshot
   field :name, type: String
   field :url, type: String
   field :state, type: String
+  
+  def render_url(args=nil)
+    querystring = ""
+    if !args.nil?
+      querystring = "?"
+      if args.kind_of? String
+        querystring += "#{args}"
+      else
+        querystring += args.collect {|k, v| "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"}.join("&")
+      end
+    end
+    return "//snap-it-up.imgix.net/#{self.name}#{querystring}"
+  end
 end
