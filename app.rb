@@ -168,6 +168,13 @@ post '/hooks/event' do
     return { error: "Our status monitoring system, Pingometer, appears to be having problems." }.to_json
   end
   
+  monitor_meta = MonitorList.find {|monitor_meta| monitor_meta["hostname"] == monitor_hostname(monitor)}
+  if monitor_meta && monitor_meta["good_after"] && monitor_meta["good_after"] > Time.parse(monitor['last_event']['utc_timestamp'])
+    logger.error "Bailed recording event for monitor #{params[:monitor_id]} because the monitor is known to be inaccurate."
+    status 400
+    return { error: "Bad monitor" }.to_json
+  end
+  
   state_abbreviation = monitor_state(monitor)['state_abbreviation']
   
   local_event = MonitorEvent.create_from_pingometer(monitor['last_event'], params[:monitor_id], state_abbreviation)
