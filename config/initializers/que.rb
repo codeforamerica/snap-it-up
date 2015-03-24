@@ -5,3 +5,7 @@ Que.log_formatter = proc do |data|
     JSON.dump(data)
   end
 end
+
+Que.error_handler = proc do |error, job|
+  Raven.capture_exception error
+end
