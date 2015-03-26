@@ -50,61 +50,17 @@ end
 MonitorList = JSON.parse(File.read('public/data/pingometer_monitors.json'))
 
 get '/' do
-  # Get basic info on all monitors.
-  begin
-    monitors = Pingometer.new(PINGOMETER_USER, PINGOMETER_PASS).monitors
-  rescue
-    @error_message = "Our status monitoring system, Pingometer, appears to be having problems."
-    return erb :error
+  # Get all states into a hash
+  @state_status = Hash[MonitorList.collect {|meta| [meta["state_abbreviation"], true]}]
+  
+  # mark current incidents as down
+  Incident.current.each do |incident|
+    @state_status[incident.state] = false
   end
   
-  @down = monitors
-    .select {|monitor| monitor['last_event']['type'] == 0}
-    .map {|monitor| monitor['name'].partition(' |')[0].downcase}
-  
-  @state_status = {}
-  @state_week_uptime = {}
-  encounters = Hash.new(0)
-  
-  monitors.each do |monitor|
-    # An event type of `-1` means a monitor is paused/non-operating.
-    # For now, treat that like there's no monitor at all.
-    if monitor['last_event']['type'] == -1
-      next
-    end
-    
-    # skip if we can't figure out what state this is
-    state_data = monitor_state(monitor)
-    if state_data.nil?
-      next
-    end
-    
-    state = state_data['state'].downcase
-    # We can have multiple monitors per state (e.g. California).
-    # If any are down, we want to count all as down.
-    if @state_status[state] != false
-      @state_status[state] = monitor['last_event']['type'] != 0
-    end
-    
-    days_checked = 0
-    # NOTE: no straightforward way to get the UTC date, so we convert a Time object :\
-    today = Time.now.utc.to_date
-    total_uptime = ((today - 6)..today).reduce(0) do |sum, date|
-      date_data = monitor['reports']['raw'][date.strftime('%Y-%m-%d')]
-      if date_data
-        days_checked += 1
-        sum += date_data['uT']
-      end
-      sum
-    end
-    week_uptime = days_checked > 0 ? (total_uptime / days_checked) : 0
-    if encounters[state] > 0
-      week_uptime = (@state_week_uptime[state] * encounters[state] + week_uptime) / (encounters[state] + 1)
-    end
-    @state_week_uptime[state] = week_uptime
-
-    encounters[state] += 1
-  end
+  now = Time.now
+  week_ago =  (now.utc.to_date - 7.days).to_time
+  @state_week_uptime = state_uptimes_between(now - 7.days, now)
   
   erb :index
 end
@@ -179,7 +135,7 @@ post '/hooks/event' do
   local_event = MonitorEvent.create_from_pingometer(monitor['last_event'], params[:monitor_id], state_abbreviation)
   
   # Update incidents
-  last_incident = Incident.where(monitor: params[:monitor_id]).current || Incident.new
+  last_incident = Incident.where(monitor: params[:monitor_id]).current.first || Incident.new
   last_incident.add_event(local_event)
   last_incident.save
   
@@ -255,4 +211,31 @@ def save_snapshot(name, data)
     end
     nil
   end
-end 
+end
+
+def state_uptimes_between(t1, t2)
+  # Get incidents over a time period, trimmed to the time period
+  incidents = Incident.or(
+    {:start_date.lte => t2, :end_date.gte => t1},
+    {:start_date => nil, :end_date.gte => t1},
+    {:start_date.lte => t2, :end_date => nil}
+  ).collect do |incident|
+    if incident.start_date.nil? || incident.start_date < t1
+      incident.start_date = t1
+    end
+    if incident.end_date.nil? || incident.end_date > t2
+      incident.end_date = t2
+    end
+    incident
+  end
+  
+  # Group by state and calculate uptime for each.
+  timeframe = t2 - t1
+  uptimes = Hash[MonitorList.collect {|meta| [meta["state_abbreviation"], 100]}]
+  incidents.group_by {|incident| incident.state}.each do |state, incidents|
+    downtime = incidents.inject(0) {|downtime, incident| downtime + (incident.end_date - incident.start_date)}
+    uptimes[state] = 100 * (timeframe - downtime) / timeframe
+  end
+  
+  uptimes
+end

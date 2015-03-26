@@ -35,10 +35,10 @@
           .attr("xlink:href", function(d) { return statesByCode[d.id] ? ("/states/" + statesByCode[d.id].abbreviation) : "#"; })
           .append("path")
           .attr("class", function(d) {
-            var stateName = statesByCode[d.id] && statesByCode[d.id].name.toLowerCase();
+            var stateAbbreviation = statesByCode[d.id] && statesByCode[d.id].abbreviation;
             var statusClass = "state-unknown";
-            if (stateName in stateStatus) {
-              statusClass = stateStatus[stateName] ? "state-up" : "state-down";
+            if (stateAbbreviation in stateStatus) {
+              statusClass = stateStatus[stateAbbreviation] ? "state-up" : "state-down";
             }
             return "state " + statusClass;
           })
@@ -63,9 +63,9 @@
           .attr("xlink:href", function(d) { return statesByCode[d.id] ? ("/states/" + statesByCode[d.id].abbreviation) : "#"; })
           .append("path")
           .attr("fill", function(d) {
-            var stateName = statesByCode[d.id] && statesByCode[d.id].name.toLowerCase();
-            if (stateName in stateWeekUptime) {
-              var normalizedUptime = Math.max(stateWeekUptime[stateName] - 80, 0) / 20;
+            var stateAbbreviation = statesByCode[d.id] && statesByCode[d.id].abbreviation;
+            if (stateAbbreviation in stateWeekUptime) {
+              var normalizedUptime = Math.max(stateWeekUptime[stateAbbreviation] - 80, 0) / 20;
               return uptimeColor(normalizedUptime);
             }
             return "";
@@ -86,16 +86,16 @@
           .append("text")
           .attr("class", "uptime-label")
           .attr("x", function(d) {
-            console.log(path.centroid(d));
+            // console.log(path.centroid(d));
             return path.centroid(d)[0] || 0;
           })
           .attr("y", function(d) {
             return path.centroid(d)[1] || 0;
           })
           .text(function(d) {
-            var stateName = statesByCode[d.id] && statesByCode[d.id].name.toLowerCase();
-            if (stateName in stateWeekUptime) {
-              return Math.round(stateWeekUptime[stateName] * 10) / 10 + "%";
+            var stateAbbreviation = statesByCode[d.id] && statesByCode[d.id].abbreviation;
+            if (stateAbbreviation in stateWeekUptime) {
+              return Math.round(stateWeekUptime[stateAbbreviation] * 10) / 10 + "%";
             }
             return "";
           });

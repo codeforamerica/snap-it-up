@@ -9,7 +9,7 @@ class Incident
   field :milliseconds
   
   def self.current
-    self.where(end_date: nil).order({start_date: -1}).first
+    self.where(end_date: nil).order({start_date: -1})
   end
   
   def add_event(event)
