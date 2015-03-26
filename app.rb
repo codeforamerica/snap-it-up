@@ -59,8 +59,9 @@ get '/' do
   end
   
   now = Time.now
-  week_ago =  (now.utc.to_date - 7.days).to_time
-  @state_week_uptime = state_uptimes_between(now - 7.days, now)
+  week_ago = (now.utc.to_date - 6.days).to_time
+  week_ago = week_ago + week_ago.utc_offset
+  @state_week_uptime = state_uptimes_between(week_ago, now)
   
   erb :index
 end
@@ -233,7 +234,10 @@ def state_uptimes_between(t1, t2)
   timeframe = t2 - t1
   uptimes = Hash[MonitorList.collect {|meta| [meta["state_abbreviation"], 100]}]
   incidents.group_by {|incident| incident.state}.each do |state, incidents|
-    downtime = incidents.inject(0) {|downtime, incident| downtime + (incident.end_date - incident.start_date)}
+    downtimes = incidents.group_by {|incident| incident.monitor}.collect do |monitor, incidents|
+      incidents.inject(0) {|downtime, incident| downtime + (incident.end_date - incident.start_date)}
+    end
+    downtime = downtimes.max
     uptimes[state] = 100 * (timeframe - downtime) / timeframe
   end
   
