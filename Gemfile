@@ -11,5 +11,9 @@ gem "mongoid", "~> 4.0"
 gem "rake"
 gem "sentry-raven"
 
+# Workers/scheduling
+gem "qu-mongoid"
+gem "clockwork"
+
 # For browserstack
 gem "selenium-webdriver"

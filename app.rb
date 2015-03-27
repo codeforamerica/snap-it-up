@@ -10,9 +10,11 @@ require './lib/browserstack.rb'
 require 'aws-sdk'
 require 'httparty'
 require 'mongoid'
+require 'qu-mongoid'
 require './models/monitor_event.rb'
 require './models/snapshot.rb'
 require './models/incident.rb'
+require './jobs/load_pingometer_events.rb'
 
 PINGOMETER_USER = ENV['PINGOMETER_USER']
 PINGOMETER_PASS = ENV['PINGOMETER_PASS']
@@ -25,6 +27,7 @@ MONGO_URI = ENV['MONGO_URI'] || ENV['MONGOLAB_URI'] || "mongodb://localhost:2701
 PAGESNAP_URL = ENV['PAGESNAP_URL']
 BROWSERSTACK_USER = ENV['BROWSERSTACK_USER']
 BROWSERSTACK_KEY = ENV['BROWSERSTACK_KEY']
+USE_WEBHOOK = (ENV['USE_WEBHOOK'] || '').downcase == 'true'
 
 configure do
   Mongoid.configure do |config|
@@ -115,6 +118,12 @@ end
 
 post '/hooks/event' do
   content_type :json
+  
+  if !USE_WEBHOOK
+    logger.info "IGNORING event hook for monitor #{params[:monitor_id]}"
+    status 501
+    return { message: "Webhooks are currently ignored." }.to_json
+  end
   
   logger.info "Received event hook for monitor #{params[:monitor_id]}"
   
