@@ -10,6 +10,7 @@ gem "aws-sdk"
 gem "mongoid", "~> 4.0"
 gem "rake"
 gem "sentry-raven"
+gem "sass"
 
 # For browserstack
 gem "selenium-webdriver"
