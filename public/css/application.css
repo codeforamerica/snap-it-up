@@ -519,4 +519,33 @@ p {
     content: "";
     display: table; }
 
+/* INDEX PAGE SPECIFIC */
+.map {
+  width: 100%; }
+
+.states {
+  fill: transparent; }
+
+.states a {
+  stroke: none; }
+
+.states path {
+  stroke: #fff; }
+
+.states .state-down {
+  fill: #FF5200; }
+
+.states .state-up {
+  fill: #B1CCE8; }
+
+.uptime-label {
+  fill: #fff;
+  text-anchor: middle;
+  font-family: helvetica, arial, sans-serif;
+  font-size: 1em;
+  stroke: #869BB0;
+  stroke-width: 2;
+  stroke-opacity: 0.75;
+  paint-order: stroke; }
+
 /*# sourceMappingURL=application.css.map */

@@ -241,3 +241,10 @@ p {
   @include outer-container();
   margin-top: 0;
 }
+
+// ====
+// import svg styling
+// ====
+@import 'svg-chart-styles';
+
+
