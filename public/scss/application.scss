@@ -63,74 +63,6 @@ body {
 }
 
 // =====
-// Basic rules for our off-canvas nav
-// =====
-
-#js-page {
-  min-width: 100%;
-  min-height: 100%;
-  background-color: lighten(gray,60);
-  position: relative;
-  top: 0;
-  bottom: 100%;
-  left: 0;
-  z-index: 2;
-  overflow: hidden;
-  margin-top: 0;
-
-  @include transition(all 0.3s ease-in-out);
-}
-
-#js-page:before {
-  content: '';
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  display: none;
-  background-color: rgba(0,0,0,0.5);
-  z-index: 100;
-  opacity: 0;
-
-  @include transition(all 0.3s ease-in-out);
-}
-
-#js-offpage {
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
-  position: fixed;
-  background-color: $black;
-  margin-top: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 0;
-  display: none;
-}
-
-// When the menu is open
-
-body.js-menu-open {
-  #js-page {
-    @include transform(translateX(-300px));
-    overflow: hidden;
-    position: fixed;
-    height: 100%;
-  }
-  #js-page:before {
-    display: block;
-    opacity: 1;
-  }
-  #js-offpage {
-    display: block;
-  }
-  div.expand a:before {
-    content: "\f217";
-  }
-}
-
-// =====
 // Base spacing rules
 // =====
 
@@ -143,25 +75,26 @@ body.js-menu-open {
 
 * + * {
   // The lobotomized owl. Hoo, hoo.
+  // spacing between adjacent block level elements
+  // all block level elements that are preceded by another block level element
   margin-top: 1.5em;
 }
 
 .u-small-spacing {
+  // tighten up spacing within small-spacing elements
   * + * {
     margin-top: 0.5em;
   }
 }
 
 .u-row > * {
+  @include row();
+  // for rows of floated block elements
   margin-top: 0;
 }
 
 .u-nomargin {
   margin-top: 0;
-}
-
-#js-main {
-  margin-top: 60px;
 }
 
 // =====
@@ -178,48 +111,63 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 h1 {
-  font-size: $base-size * 2.5;
+  font-size: $base-size * 1.6;
   
-  @include media($medium-desktop) {
-    font-size: $base-size * 2;  
+  @include media($medium) {
+    font-size: $base-size * 2;
   }
-  @include media($tablet) {
-    font-size: $base-size * 1.9;
+  @include media($large) {
+    font-size: $base-size * 2.4;
   }
-  @include media($mobile) {
-    font-size: $base-size * 1.6;
-  }
-  @include media($mobile) {
-    font-size: $base-size * 1.3;
+  @include media($xlarge) {
+    font-size: $base-size * 2.8;  
   }
 }
 
 h2 {
-  font-size: $base-size * 1.5;
+  font-size: $base-size * 1.4;
 
-  @include media($tablet) {
-    font-size: $base-size * 1;    
+  @include media($medium) {
+    font-size: $base-size * 1.6;    
+  }
+  @include media($large) {
+    font-size: $base-size * 1.8;    
+  }
+  @include media($xlarge) {
+    font-size: $base-size * 2;    
   }
 }
 
 h3 {
-  font-size: $base-size * 1.3;
-  line-height: 1.8;
+  font-size: $base-size * 1.2;
+  @include media($medium) {
+    font-size: $base-size * 1.4;    
+  }
+  @include media($large) {
+    font-size: $base-size * 1.6;    
+  }
+  @include media($xlarge) {
+    font-size: $base-size * 1.8;    
+  }
 }
 
 p {
   font-family: $serif;
   font-weight: 400;
   font-size: $base-size;
-  line-height: 1.8;
+  line-height: 1.6;
   color: $black;
 
-  @include media($tablet) {
-    font-size: $base-size * 0.9;
+  @include media($medium) {
+    font-size: $base-size * 1.05;
     line-height: 2;
   }
-  @include media($tablet) {
-    font-size: $base-size * 0.8;
+  @include media($large) {
+    font-size: $base-size * 1.1;
+    line-height: 2;
+  }
+  @include media($xlarge) {
+    font-size: $base-size * 1.15;
     line-height: 2;
   }
 }
@@ -239,7 +187,11 @@ p {
 
 .container {
   @include outer-container();
-  margin-top: 0;
+  margin: 0 auto;
+}
+
+img {
+    width: 100%;
 }
 
 // ====
