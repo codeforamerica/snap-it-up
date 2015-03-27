@@ -15,6 +15,7 @@ require './models/monitor_event.rb'
 require './models/snapshot.rb'
 require './models/incident.rb'
 require './jobs/load_pingometer_events.rb'
+require './jobs/snapshot_monitor.rb'
 
 PINGOMETER_USER = ENV['PINGOMETER_USER']
 PINGOMETER_PASS = ENV['PINGOMETER_PASS']
@@ -122,7 +123,7 @@ post '/hooks/event' do
   if !USE_WEBHOOK
     logger.info "IGNORING event hook for monitor #{params[:monitor_id]}"
     status 501
-    return { message: "Webhooks are currently ignored." }.to_json
+    return { error: "Webhooks are currently ignored." }.to_json
   end
   
   logger.info "Received event hook for monitor #{params[:monitor_id]}"
@@ -149,34 +150,9 @@ post '/hooks/event' do
   last_incident.add_event(local_event)
   last_incident.save
   
-  page_url = monitor_url(monitor)
+  Qu.enqueue(SnapshotMonitor, params[:monitor_id])
   
-  logger.info "Snapshotting #{page_url}"
-  snapshot = nil
-  begin
-    snapshot = Snapshotter.snapshot page_url
-  rescue
-    snapshot = File.read("public/images/unreachable.png")
-  end
-
-  state_status = local_event.up? ? "UP" : "DOWN"
-  file_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{state_status}-#{local_event.pingometer_id}.png"
-  url = save_snapshot(file_name, snapshot)
-  
-  Snapshot.create(
-    state: state_abbreviation,
-    monitor: params[:monitor_id],
-    status: state_status,
-    event_id: local_event.id,
-    event_pingometer_id: local_event.pingometer_id,
-    date: Time.now,
-    name: file_name,
-    url: url
-  )
-  
-  logger.info "Snapshot saved: #{file_name}, #{url}"
-  
-  return { url: page_url }.to_json
+  return { message: "Event saved." }.to_json
 end
 
 # Kind of hacky thing to get an ensured hostname

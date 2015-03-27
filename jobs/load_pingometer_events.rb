@@ -21,7 +21,10 @@ class LoadPingometerEvents
   end
   
   def load_events
-    monitors.each &method(:load_monitor_events)
+    with_new_events = monitors.find_all &method(:load_monitor_events)
+    with_new_events.each do |monitor|
+      Qu.enqueue(SnapshotMonitor, monitor['id'])
+    end
   end
   
   def load_monitor_events(monitor)
@@ -29,12 +32,16 @@ class LoadPingometerEvents
     
     state_abbreviation = monitor_state(monitor)['state_abbreviation']
     
+    new_events = false
     client.events(monitor).each do |event|
       model = MonitorEvent.from_pingometer(event, monitor['id'], state_abbreviation)
       if !MonitorEvent.where(monitor: model.monitor, date: model.date).exists?
         model.save
+        new_events = true
       end
     end
+    
+    new_events
   end
   
   def create_incidents
