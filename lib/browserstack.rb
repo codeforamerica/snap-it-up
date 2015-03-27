@@ -15,6 +15,8 @@ class Browserstack
       :url => get_url,
       :desired_capabilities => Selenium::WebDriver::Remote::Capabilities.firefox)
     driver.navigate.to url
-    driver.screenshot_as(:png)
+    image = driver.screenshot_as(:png)
+    driver.quit
+    image
   end
 end
