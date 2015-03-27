@@ -1,0 +1,243 @@
+//
+// application.scss
+//
+// Our base file. Imports everything we need and holds
+// components we haven't broken out to partials.
+//
+
+// =====
+// Variables
+// =====
+
+$black: rgba(0,0,0,0.8);
+$red: #cf1b41;
+$green: #3e5641;
+$gray: #363537;
+$blue: #004b6a;
+
+$background-tint: rgba(0,0,0,0.04);
+$dark-tint: $gray;
+$text-color: $black;
+$primary-color: $red;
+$secondary-color: $blue;
+$third-color: $green;
+
+$serif: "abril-text","Sentinel",serif;
+$sans-serif: "proxima-nova","Proxima Nova",Helvetica,sans-serif;
+
+$padding: 2em;
+
+// =====
+// Imports
+// =====
+
+@import 'vendor/bourbon/bourbon';
+@import 'grid-settings';
+@import 'vendor/neat/neat';
+@import 'vendor/normalize';
+@import 'vendor/iconfont';
+
+// =====
+// Mixin helpers
+// =====
+
+@mixin iconfont() {
+  // Zurb iconfont settings, should go in a :before pseudo-selector
+  font-family: "foundation-icons";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  text-decoration: inherit;
+}
+
+// =====
+// Color the body a little
+// =====
+
+body {
+  background-color: lighten(gray,60);
+}
+
+// =====
+// Basic rules for our off-canvas nav
+// =====
+
+#js-page {
+  min-width: 100%;
+  min-height: 100%;
+  background-color: lighten(gray,60);
+  position: relative;
+  top: 0;
+  bottom: 100%;
+  left: 0;
+  z-index: 2;
+  overflow: hidden;
+  margin-top: 0;
+
+  @include transition(all 0.3s ease-in-out);
+}
+
+#js-page:before {
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: none;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 100;
+  opacity: 0;
+
+  @include transition(all 0.3s ease-in-out);
+}
+
+#js-offpage {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  position: fixed;
+  background-color: $black;
+  margin-top: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  display: none;
+}
+
+// When the menu is open
+
+body.js-menu-open {
+  #js-page {
+    @include transform(translateX(-300px));
+    overflow: hidden;
+    position: fixed;
+    height: 100%;
+  }
+  #js-page:before {
+    display: block;
+    opacity: 1;
+  }
+  #js-offpage {
+    display: block;
+  }
+  div.expand a:before {
+    content: "\f217";
+  }
+}
+
+// =====
+// Base spacing rules
+// =====
+
+* {
+  margin: 0;
+  padding: 0;
+  color: $black;
+  box-sizing: border-box;
+}
+
+* + * {
+  // The lobotomized owl. Hoo, hoo.
+  margin-top: 1.5em;
+}
+
+.u-small-spacing {
+  * + * {
+    margin-top: 0.5em;
+  }
+}
+
+.u-row > * {
+  margin-top: 0;
+}
+
+.u-nomargin {
+  margin-top: 0;
+}
+
+#js-main {
+  margin-top: 60px;
+}
+
+// =====
+// Base typography
+// =====
+
+$base-size: 18px;
+
+h1,h2,h3,h4,h5,h6 {
+  font-family: $sans-serif;
+  font-weight: 300;
+  line-height: 1.5;
+  color: $black;
+}
+
+h1 {
+  font-size: $base-size * 2.5;
+  
+  @include media($medium-desktop) {
+    font-size: $base-size * 2;  
+  }
+  @include media($tablet) {
+    font-size: $base-size * 1.9;
+  }
+  @include media($mobile) {
+    font-size: $base-size * 1.6;
+  }
+  @include media($mobile) {
+    font-size: $base-size * 1.3;
+  }
+}
+
+h2 {
+  font-size: $base-size * 1.5;
+
+  @include media($tablet) {
+    font-size: $base-size * 1;    
+  }
+}
+
+h3 {
+  font-size: $base-size * 1.3;
+  line-height: 1.8;
+}
+
+p {
+  font-family: $serif;
+  font-weight: 400;
+  font-size: $base-size;
+  line-height: 1.8;
+  color: $black;
+
+  @include media($tablet) {
+    font-size: $base-size * 0.9;
+    line-height: 2;
+  }
+  @include media($tablet) {
+    font-size: $base-size * 0.8;
+    line-height: 2;
+  }
+}
+
+// =====
+// Utility classes
+//
+
+// Unstyled un-ordered list
+.u-unstyled {
+  list-style-type: none;
+}
+
+// =====
+// Basic layout
+// =====
+
+.container {
+  @include outer-container();
+  margin-top: 0;
+}
