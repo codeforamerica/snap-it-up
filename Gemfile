@@ -13,3 +13,7 @@ gem "sentry-raven"
 
 # For browserstack
 gem "selenium-webdriver"
+
+group :test do
+  gem "rspec"
+end
