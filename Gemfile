@@ -17,3 +17,7 @@ gem "clockwork"
 
 # For browserstack
 gem "selenium-webdriver"
+
+group :test do
+  gem "rspec"
+end
