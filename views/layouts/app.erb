@@ -3,8 +3,11 @@
 <head>
   <meta charset="utf-8"> 
   <title><%= content_for?(:scripts) ? yield_content(:title) : 'SNAP Status' %><%= PRODUCTION ? '' : ' (development)'%></title>
-  <script src="//use.typekit.net/inc1khj.js"></script>
-  <script>try{Typekit.load();}catch(e){}</script>
+
+    <%#include SnapItUp kit from TypeKit%>
+    <script src="//use.typekit.net/myv4qam.js"></script>
+    <script>try{Typekit.load();}catch(e){}</script>
+
   <link rel="stylesheet" href="/css/application.css" type="text/css" media="screen">
   <%= erb :'shared/_fonts' %>
 </head>
