@@ -24,6 +24,9 @@ GEM
     builder (3.2.2)
     childprocess (0.5.5)
       ffi (~> 1.0, >= 1.0.11)
+    clockwork (1.1.0)
+      activesupport
+      tzinfo
     connection_pool (2.1.2)
     diff-lcs (1.2.5)
     faraday (0.9.1)
@@ -53,6 +56,11 @@ GEM
     origin (2.1.1)
     puma (2.11.1)
       rack (>= 1.1, < 2.0)
+    qu (0.2.0)
+      multi_json
+    qu-mongoid (0.2.2)
+      mongoid (>= 3.0)
+      qu
     rack (1.6.0)
     rack-protection (1.5.3)
       rack
@@ -102,9 +110,11 @@ PLATFORMS
 
 DEPENDENCIES
   aws-sdk
+  clockwork
   httparty
   mongoid (~> 4.0)
   puma
+  qu-mongoid
   rack-timeout
   rake
   rspec
