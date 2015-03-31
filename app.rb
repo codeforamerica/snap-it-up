@@ -122,7 +122,6 @@ get '/api/v0/uptime' do
   content_type :json
   
   bucket_size = {
-    'minute' => 1.minute.seconds,
     'hour' => 1.hour.seconds,
     'day' => 1.day.seconds,
     'week' => 1.week.seconds,
