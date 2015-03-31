@@ -10,9 +10,12 @@ require './lib/browserstack.rb'
 require 'aws-sdk'
 require 'httparty'
 require 'mongoid'
+require 'qu-mongoid'
 require './models/monitor_event.rb'
 require './models/snapshot.rb'
 require './models/incident.rb'
+require './jobs/load_pingometer_events.rb'
+require './jobs/snapshot_monitor.rb'
 
 PINGOMETER_USER = ENV['PINGOMETER_USER']
 PINGOMETER_PASS = ENV['PINGOMETER_PASS']
@@ -25,6 +28,7 @@ MONGO_URI = ENV['MONGO_URI'] || ENV['MONGOLAB_URI'] || "mongodb://localhost:2701
 PAGESNAP_URL = ENV['PAGESNAP_URL']
 BROWSERSTACK_USER = ENV['BROWSERSTACK_USER']
 BROWSERSTACK_KEY = ENV['BROWSERSTACK_KEY']
+USE_WEBHOOK = (ENV['USE_WEBHOOK'] || '').downcase == 'true'
 
 configure do
   Mongoid.configure do |config|
@@ -50,55 +54,18 @@ end
 MonitorList = JSON.parse(File.read('public/data/pingometer_monitors.json'))
 
 get '/' do
-  # Get basic info on all monitors.
-  begin
-    monitors = Pingometer.new(PINGOMETER_USER, PINGOMETER_PASS).monitors
-  rescue
-    @error_message = "Our status monitoring system, Pingometer, appears to be having problems."
-    return erb :error
+  # Get all states into a hash
+  @state_status = Hash[MonitorList.collect {|meta| [meta["state_abbreviation"], true]}]
+  
+  # mark current incidents as down
+  Incident.current.each do |incident|
+    @state_status[incident.state] = false
   end
   
-  @down = monitors
-    .select {|monitor| monitor['last_event']['type'] == 0}
-    .map {|monitor| monitor['name'].partition(' |')[0].downcase}
-  
-  @state_status = {}
-  @state_week_uptime = {}
-  encounters = Hash.new(0)
-  
-  monitors.each do |monitor|
-    # An event type of `-1` means a monitor is paused/non-operating.
-    # For now, treat that like there's no monitor at all.
-    if monitor['last_event']['type'] == -1
-      next
-    end
-    
-    state = monitor_state(monitor)['state'].downcase
-    # We can have multiple monitors per state (e.g. California).
-    # If any are down, we want to count all as down.
-    if @state_status[state] != false
-      @state_status[state] = monitor['last_event']['type'] != 0
-    end
-    
-    days_checked = 0
-    # NOTE: no straightforward way to get the UTC date, so we convert a Time object :\
-    today = Time.now.utc.to_date
-    total_uptime = ((today - 6)..today).reduce(0) do |sum, date|
-      date_data = monitor['reports']['raw'][date.strftime('%Y-%m-%d')]
-      if date_data
-        days_checked += 1
-        sum += date_data['uT']
-      end
-      sum
-    end
-    week_uptime = days_checked > 0 ? (total_uptime / days_checked) : 0
-    if encounters[state] > 0
-      week_uptime = (@state_week_uptime[state] * encounters[state] + week_uptime) / (encounters[state] + 1)
-    end
-    @state_week_uptime[state] = week_uptime
-
-    encounters[state] += 1
-  end
+  now = Time.now
+  week_ago = (now.utc.to_date - 6.days).to_time
+  week_ago = week_ago + week_ago.utc_offset
+  @state_week_uptime = state_uptimes_between(week_ago, now)
   
   erb :index
 end
@@ -150,8 +117,31 @@ get '/states/:state_abbreviation' do
   }}
 end
 
+# Efficient? NO. BUT IT WORKS.
+get '/api/v0/uptime' do
+  content_type :json
+  
+  bucket_size = {
+    'hour' => 1.hour.seconds,
+    'day' => 1.day.seconds,
+    'week' => 1.week.seconds,
+    'month' => 1.month.seconds
+  }[params[:bucket]]
+  
+  start_date = make_time(params[:start_date])
+  end_date = make_time(params[:end_date])
+  
+  return state_uptime_series(start_date, end_date, bucket_size).to_json
+end
+
 post '/hooks/event' do
   content_type :json
+  
+  if !USE_WEBHOOK
+    logger.info "IGNORING event hook for monitor #{params[:monitor_id]}"
+    status 501
+    return { error: "Webhooks are currently ignored." }.to_json
+  end
   
   logger.info "Received event hook for monitor #{params[:monitor_id]}"
   
@@ -180,38 +170,13 @@ post '/hooks/event' do
   local_event = MonitorEvent.create_from_pingometer(monitor['last_event'], params[:monitor_id], state_abbreviation)
   
   # Update incidents
-  last_incident = Incident.where(monitor: params[:monitor_id]).current || Incident.new
+  last_incident = Incident.where(monitor: params[:monitor_id]).current.first || Incident.new
   last_incident.add_event(local_event)
   last_incident.save
   
-  page_url = monitor_url(monitor)
+  Qu.enqueue(SnapshotMonitor, params[:monitor_id])
   
-  logger.info "Snapshotting #{page_url}"
-  snapshot = nil
-  begin
-    snapshot = Snapshotter.snapshot page_url
-  rescue
-    snapshot = File.read("public/images/unreachable.png")
-  end
-
-  state_status = local_event.up? ? "UP" : "DOWN"
-  file_name = "#{state_abbreviation}-#{params[:monitor_id]}-#{state_status}-#{local_event.pingometer_id}.png"
-  url = save_snapshot(file_name, snapshot)
-  
-  Snapshot.create(
-    state: state_abbreviation,
-    monitor: params[:monitor_id],
-    status: state_status,
-    event_id: local_event.id,
-    event_pingometer_id: local_event.pingometer_id,
-    date: Time.now,
-    name: file_name,
-    url: url
-  )
-  
-  logger.info "Snapshot saved: #{file_name}, #{url}"
-  
-  return { url: page_url }.to_json
+  return { message: "Event saved." }.to_json
 end
 
 # Kind of hacky thing to get an ensured hostname
@@ -256,4 +221,68 @@ def save_snapshot(name, data)
     end
     nil
   end
-end 
+end
+
+def state_uptimes_between(t1, t2)
+  # Get incidents over a time period, trimmed to the time period
+  incidents = Incident.or(
+    {:start_date.lte => t2, :end_date.gte => t1},
+    {:start_date => nil, :end_date.gte => t1},
+    {:start_date.lte => t2, :end_date => nil}
+  ).collect do |incident|
+    if incident.start_date.nil? || incident.start_date < t1
+      incident.start_date = t1
+    end
+    if incident.end_date.nil? || incident.end_date > t2
+      incident.end_date = t2
+    end
+    incident
+  end
+  
+  # Group by state and calculate uptime for each.
+  timeframe = t2 - t1
+  uptimes = Hash[MonitorList.collect {|meta| [meta["state_abbreviation"], 100]}]
+  incidents.group_by {|incident| incident.state}.each do |state, incidents|
+    downtimes = incidents.group_by {|incident| incident.monitor}.collect do |monitor, incidents|
+      incidents.inject(0) {|downtime, incident| downtime + (incident.end_date - incident.start_date)}
+    end
+    downtime = downtimes.max
+    uptimes[state] = 100 * (timeframe - downtime) / timeframe
+  end
+  
+  uptimes
+end
+
+def state_uptime_series(start_date=nil, end_date=nil, bucket_size=nil)
+  start_date ||= Time.parse('2015-02-01T00:00:00Z')
+  end_date ||= Time.now
+  bucket_size ||= 1.day.seconds
+  
+  buckets = (end_date - start_date) / bucket_size
+  series = []
+  buckets.ceil.times do |index|
+    date = start_date + index * bucket_size
+    series << {
+      date: date.iso8601,
+      states: state_uptimes_between(date, date + bucket_size)
+    }
+  end
+  
+  return series
+end
+
+def make_time(timestamp)
+  if !timestamp.kind_of? String
+    return nil
+  end
+  
+  if timestamp.match /^\d{2,4}-\d{1,2}-\d{1,2}$/
+    timestamp = "#{timestamp}T00:00:00Z"
+  end
+  
+  begin
+    Time.parse(timestamp)
+  rescue
+    nil
+  end
+end
