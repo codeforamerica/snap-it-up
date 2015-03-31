@@ -36,12 +36,29 @@ class LoadPingometerEvents
     client.events(monitor).each do |event|
       model = MonitorEvent.from_pingometer(event, monitor['id'], state_abbreviation)
       if !MonitorEvent.where(monitor: model.monitor, date: model.date).exists?
+        model.accepted = accept_item?(model)
         model.save
         new_events = true
       end
     end
     
     new_events
+  end
+  
+  def accept_item?(item)
+    meta = MonitorList.find {|meta| meta["id"] == item.monitor}
+    
+    if meta && meta['ignore_dates']
+      meta['ignore_dates'].each do |dates|
+        start_date = (dates[0] && dates[0].to_time) || Time.new(2000, 1, 1)
+        end_date = (dates[1] && dates[1].to_time) || Time.new(3000, 1, 1)
+        if item.in_date_range?(start_date, end_date)
+          return false
+        end
+      end
+    end
+    
+    true
   end
   
   def create_incidents
