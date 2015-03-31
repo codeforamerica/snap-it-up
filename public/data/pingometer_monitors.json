@@ -33,7 +33,10 @@
         "state": "Kansas",
         "state_abbreviation": "KS",
         "state_code": "20",
-        "time_zone": ["CST", "MST"]
+        "time_zone": ["CST", "MST"],
+        "ignore_dates": [
+          [null, "2015-02-02T21:38:00-08:00"]
+        ]
     },
     {
         "hostname": "apps.nd.gov",
@@ -132,7 +135,10 @@
         "state": "Louisiana",
         "state_abbreviation": "LA",
         "state_code": "22",
-        "time_zone": ["CST"]
+        "time_zone": ["CST"],
+        "ignore_dates": [
+          ["2015-02-03T05:15:22.676Z", "2015-03-23T18:50:34.203Z"]
+        ]
     },
     {
         "hostname": "mybenefits.ahs.state.vt.us",
@@ -141,7 +147,10 @@
         "state": "Vermont",
         "state_abbreviation": "VT",
         "state_code": "50",
-        "time_zone": ["EST"]
+        "time_zone": ["EST"],
+        "ignore_dates": [
+          ["2015-03-24T13:15:48.898Z", "2015-03-27T20:36:24.649Z"]
+        ]
     },
     {
         "hostname": "access.wisconsin.gov",
@@ -204,7 +213,11 @@
         "state": "Indiana",
         "state_abbreviation": "IN",
         "state_code": "18",
-        "time_zone": ["CST", "EST"]
+        "time_zone": ["CST", "EST"],
+        "ignore_dates": [
+          [null, "2015-02-02T21:32:00-08:00"],
+          ["2015-03-02T00:00:00Z", null]
+        ]
     },
     {
         "hostname": "www.wvinroads.org",
