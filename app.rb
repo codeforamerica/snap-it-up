@@ -225,11 +225,7 @@ end
 
 def state_uptimes_between(t1, t2)
   # Get incidents over a time period, trimmed to the time period
-  incidents = Incident.or(
-    {:start_date.lte => t2, :end_date.gte => t1},
-    {:start_date => nil, :end_date.gte => t1},
-    {:start_date.lte => t2, :end_date => nil}
-  ).collect do |incident|
+  incidents = Incident.intersecting(t1, t2).collect do |incident|
     if incident.start_date.nil? || incident.start_date < t1
       incident.start_date = t1
     end
@@ -243,11 +239,32 @@ def state_uptimes_between(t1, t2)
   timeframe = t2 - t1
   uptimes = Hash[MonitorList.collect {|meta| [meta["state_abbreviation"], 100]}]
   incidents.group_by {|incident| incident.state}.each do |state, incidents|
-    downtimes = incidents.group_by {|incident| incident.monitor}.collect do |monitor, incidents|
-      incidents.inject(0) {|downtime, incident| downtime + (incident.end_date - incident.start_date)}
+    monitor_uptimes = incidents.group_by {|incident| incident.monitor}.collect do |monitor, incidents|
+      # incidents.inject(0) {|downtime, incident| downtime + (incident.end_date - incident.start_date)}
+      
+      monitor_time = timeframe
+      downtime = 0
+      incidents.each do |incident|
+        seconds = (incident.end_date - incident.start_date)
+        if incident.accepted?
+          downtime += seconds
+        else
+          monitor_time -= seconds
+        end
+      end
+      
+      if monitor_time
+        (monitor_time - downtime) / monitor_time
+      else
+        1000
+      end
     end
-    downtime = downtimes.max
-    uptimes[state] = 100 * (timeframe - downtime) / timeframe
+    uptime = monitor_uptimes.min
+    if uptime <= 1
+      uptimes[state] = 100 * uptime
+    else
+      uptimes.delete(state)
+    end
   end
   
   uptimes

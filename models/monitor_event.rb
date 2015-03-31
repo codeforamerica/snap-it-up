@@ -9,6 +9,7 @@ class MonitorEvent
   field :status, type: Integer
   field :date
   field :state, type: String
+  field :accepted, type: Boolean, default: true
   
   default_scope ->{ order({date: 1}) }
   
@@ -34,6 +35,10 @@ class MonitorEvent
   
   def up?
     status != 0
+  end
+  
+  def in_date_range?(start_date, end_date)
+    self.date >= start_date && self.date <= end_date
   end
   
   protected
