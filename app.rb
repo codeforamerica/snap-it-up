@@ -117,6 +117,24 @@ get '/states/:state_abbreviation' do
   }}
 end
 
+# Efficient? NO. BUT IT WORKS.
+get '/api/v0/uptime' do
+  content_type :json
+  
+  bucket_size = {
+    'minute' => 1.minute.seconds,
+    'hour' => 1.hour.seconds,
+    'day' => 1.day.seconds,
+    'week' => 1.week.seconds,
+    'month' => 1.month.seconds
+  }[params[:bucket]]
+  
+  start_date = make_time(params[:start_date])
+  end_date = make_time(params[:end_date])
+  
+  return state_uptime_series(start_date, end_date, bucket_size).to_json
+end
+
 post '/hooks/event' do
   content_type :json
   
@@ -227,4 +245,38 @@ def state_uptimes_between(t1, t2)
   end
   
   uptimes
+end
+
+def state_uptime_series(start_date=nil, end_date=nil, bucket_size=nil)
+  start_date ||= Time.parse('2015-02-01T00:00:00Z')
+  end_date ||= Time.now
+  bucket_size ||= 1.day.seconds
+  
+  buckets = (end_date - start_date) / bucket_size
+  series = []
+  buckets.ceil.times do |index|
+    date = start_date + index * bucket_size
+    series << {
+      date: date.iso8601,
+      states: state_uptimes_between(date, date + bucket_size)
+    }
+  end
+  
+  return series
+end
+
+def make_time(timestamp)
+  if !timestamp.kind_of? String
+    return nil
+  end
+  
+  if timestamp.match /^\d{2,4}-\d{1,2}-\d{1,2}$/
+    timestamp = "#{timestamp}T00:00:00Z"
+  end
+  
+  begin
+    Time.parse(timestamp)
+  rescue
+    nil
+  end
 end
