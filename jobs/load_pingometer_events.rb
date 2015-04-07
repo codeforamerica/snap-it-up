@@ -7,9 +7,14 @@ class LoadPingometerEvents
     monitor_log = monitor_id ? " for #{monitor_id}" : ""
     puts "Loading events from Pingometer#{monitor_log}"
 
+    start_time = Time.now
+
     @monitor_id = monitor_id
     load_events
     create_incidents
+
+    seconds = Time.now - start_time
+    puts "[Job Time] Load pingometer data#{monitor_log} - #{seconds} seconds"
   end
   
   def client
