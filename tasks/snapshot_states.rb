@@ -37,7 +37,7 @@ monitors.each do |monitor_info|
   snapshot = nil
   begin
     snapshot = Snapshotter.snapshot page_url
-  rescue
+  rescue Net::OpenTimeout
     snapshot = File.read("public/images/unreachable.png")
   end
   
