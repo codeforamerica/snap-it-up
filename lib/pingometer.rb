@@ -4,27 +4,27 @@ class Pingometer
   include HTTParty
   base_uri 'https://app.pingometer.com/api/v1.0'
   headers 'Accept' => 'application/json'
-  
+
   def initialize(user, pass)
     @auth = {username: user, password: pass}
   end
-  
+
   def monitors
-    get('/monitors')['monitors']
+    get('/monitors/')['monitors']
   end
-  
+
   def monitor(id)
-    get("/monitor/#{id}")['monitor'][0]
+    get("/monitor/#{id}/")['monitor'][0]
   end
   
   def events(monitor)
     id = monitor.kind_of?(Hash) ? monitor['id'] : monitor
-    get("/monitor/#{id}/events")['events']
+    get("/monitor/#{id}/events/")['events']
   end
-  
-  
+
+
   protected
-  
+
   def get(path, options={})
     options.merge!({basic_auth: @auth})
     response = self.class.get(path, options)
@@ -33,5 +33,5 @@ class Pingometer
     end
     response
   end
-  
+
 end
