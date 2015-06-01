@@ -18,6 +18,10 @@ class Browserstack
     driver.navigate.to url
 
     # Returns a File
-    driver.screenshot_as :png
+    image = driver.screenshot_as :png
+
+    # If we don't explicitly quit, Browserstack is left hanging!
+    driver.quit
+    image
   end
 end
