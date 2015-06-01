@@ -13,7 +13,10 @@ class Browserstack
   def snapshot(url)
     driver = Selenium::WebDriver.for(:remote,
       :url => get_url,
-      :desired_capabilities => Selenium::WebDriver::Remote::Capabilities.firefox)
+      :desired_capabilities => {
+          browser: "Firefox",
+          project: "snap-it-up"
+        })
     driver.navigate.to url
     image = driver.screenshot_as(:png)
     driver.quit
