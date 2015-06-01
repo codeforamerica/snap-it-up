@@ -13,7 +13,10 @@ class Browserstack
   def screenshot(url)
     driver = Selenium::WebDriver.for :remote,
       url: "http://#{@user}:#{@key}@hub.browserstack.com/wd/hub",
-      desired_capabilities: Selenium::WebDriver::Remote::Capabilities.firefox
+      desired_capabilities: {
+          browser: "Firefox",
+          project: "snap-it-up-rails"
+        })
 
     driver.navigate.to url
 
