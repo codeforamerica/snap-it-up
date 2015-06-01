@@ -16,7 +16,7 @@ class Browserstack
       desired_capabilities: {
           browser: "Firefox",
           project: "snap-it-up-rails"
-        })
+        }
 
     driver.navigate.to url
 
