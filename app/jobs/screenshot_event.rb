@@ -1,5 +1,4 @@
 class ScreenshotEvent < Que::Job
-
   def run(event_id)
     event = PingometerEvent.find event_id
 
@@ -9,7 +8,8 @@ class ScreenshotEvent < Que::Job
       screenshot.save!
       destroy
     end
-  rescue ActiveRecord::RecordNotFound
-    destroy # something was deleted, don't re-run the job
+  rescue => e
+    # Don't rerun on error
+    destroy
   end
 end
