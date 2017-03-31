@@ -7,13 +7,17 @@ gem "sinatra"
 gem "sinatra-contrib"
 gem "httparty"
 gem "aws-sdk"
-gem "mongoid", "~> 4.0"
+# gem "mongoid", "~> 4.0"
 gem "rake"
 gem "sentry-raven"
 
+gem "sinatra-activerecord"
+gem "pg"
+
+
 # Workers/scheduling
-gem "qu-mongoid"
-gem "clockwork"
+# gem "qu-mongoid"
+# gem "clockwork"
 
 # For browserstack
 gem "selenium-webdriver"

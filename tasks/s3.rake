@@ -48,7 +48,6 @@ namespace :s3 do
             monitor: monitor_id,
             status: monitor_event.up? ? "UP" : "DOWN",
             event_id: monitor_event.id,
-            event_pingometer_id: pingometer_event_id,
             date: date,
             name: snapshot.key,
             url: snapshot.object.public_url,

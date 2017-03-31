@@ -26,7 +26,6 @@ class SnapshotMonitor
       monitor: monitor_id,
       status: state_status,
       event_id: last_event.id,
-      event_pingometer_id: last_event.pingometer_id,
       date: Time.now,
       name: file_name,
       url: url

@@ -9,8 +9,11 @@ require './lib/pagesnap.rb'
 require './lib/browserstack.rb'
 require 'aws-sdk'
 require 'httparty'
-require 'mongoid'
-require 'qu-mongoid'
+require 'sinatra/activerecord'
+
+# require 'mongoid'
+# require 'qu-mongoid'
+
 require './models/monitor_event.rb'
 require './models/snapshot.rb'
 require './models/incident.rb'
@@ -31,13 +34,16 @@ BROWSERSTACK_KEY = ENV['BROWSERSTACK_KEY']
 USE_WEBHOOK = (ENV['USE_WEBHOOK'] || '').downcase == 'true'
 
 configure do
-  Mongoid.configure do |config|
-    config.sessions = { 
-      :default => {
-        :uri => MONGO_URI
-      }
-    }
-  end
+  # Mongoid.configure do |config|
+  #   config.sessions = { 
+  #     :default => {
+  #       :uri => MONGO_URI
+  #     }
+  #   }
+  # end
+  
+  # TODO: should probably switch to config/database.yml
+  set :database, {adapter: 'postgresql', database: 'snap-it-up-development', encoding: 'unicode', pool: '5'}
 end
 
 Aws.config.merge!({
@@ -84,7 +90,7 @@ get '/states/:state_abbreviation' do
   end
   
   state = monitors[0]["state"]
-  snapshots = Snapshot.where(state: state_abbreviation.upcase).sort(date: -1)
+  snapshots = Snapshot.where(state: state_abbreviation.upcase).order(date: :desc)
   
   begin
     all_monitors = Pingometer.new(PINGOMETER_USER, PINGOMETER_PASS).monitors
@@ -174,7 +180,7 @@ post '/hooks/event' do
   last_incident.add_event(local_event)
   last_incident.save
   
-  Qu.enqueue(SnapshotMonitor, params[:monitor_id])
+  # Qu.enqueue(SnapshotMonitor, params[:monitor_id])
   
   return { message: "Event saved." }.to_json
 end
