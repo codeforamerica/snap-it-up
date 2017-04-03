@@ -16,8 +16,8 @@ gem "pg"
 
 
 # Workers/scheduling
-# gem "qu-mongoid"
-# gem "clockwork"
+gem "que"
+gem "clockwork"
 
 # For browserstack
 gem "selenium-webdriver"

@@ -1,9 +1,5 @@
-class SnapshotMonitor
-  def self.perform(monitor_id)
-    self.new.perform(monitor_id)
-  end
-  
-  def perform(monitor_id)
+class SnapshotMonitor < Que::Job
+  def run(monitor_id)
     puts "Snapshotting #{monitor_id}"
     
     begin

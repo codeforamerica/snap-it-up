@@ -10,9 +10,9 @@ require './lib/browserstack.rb'
 require 'aws-sdk'
 require 'httparty'
 require 'sinatra/activerecord'
+require 'que'
 
 # require 'mongoid'
-# require 'qu-mongoid'
 
 require './models/monitor_event.rb'
 require './models/snapshot.rb'
@@ -44,6 +44,11 @@ configure do
   
   # TODO: should probably switch to config/database.yml
   set :database, {adapter: 'postgresql', database: 'snap-it-up-development', encoding: 'unicode', pool: '5'}
+  # NOTE: Que needs a SQL schema
+  ActiveRecord::Base.schema_format = :sql
+  
+  Que.mode = :off
+  Que.connection = ActiveRecord
 end
 
 Aws.config.merge!({
@@ -179,8 +184,6 @@ post '/hooks/event' do
   last_incident = Incident.where(monitor: params[:monitor_id]).current.first || Incident.new
   last_incident.add_event(local_event)
   last_incident.save
-  
-  # Qu.enqueue(SnapshotMonitor, params[:monitor_id])
   
   return { message: "Event saved." }.to_json
 end
