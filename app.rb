@@ -7,6 +7,7 @@ require 'fileutils'
 require './lib/pingometer.rb'
 require './lib/pagesnap.rb'
 require './lib/browserstack.rb'
+require './lib/sauce_labs.rb'
 require 'aws-sdk'
 require 'httparty'
 require 'sinatra/activerecord'
@@ -29,6 +30,8 @@ AWS_REGION = ENV['AWS_REGION']
 PRODUCTION = ENV['RACK_ENV'] == 'production'
 MONGO_URI = ENV['MONGO_URI'] || ENV['MONGOLAB_URI'] || "mongodb://localhost:27017/snap_it_up"
 PAGESNAP_URL = ENV['PAGESNAP_URL']
+SAUCE_USER = ENV['SAUCE_USER']
+SAUCE_KEY = ENV['SAUCE_KEY']
 BROWSERSTACK_USER = ENV['BROWSERSTACK_USER']
 BROWSERSTACK_KEY = ENV['BROWSERSTACK_KEY']
 USE_WEBHOOK = (ENV['USE_WEBHOOK'] || '').downcase == 'true'
@@ -56,7 +59,9 @@ Aws.config.merge!({
   region: AWS_REGION || 'us-east-1'
 })
 
-if BROWSERSTACK_USER && BROWSERSTACK_KEY
+if SAUCE_USER && SAUCE_KEY
+  Snapshotter = SauceLabs.new(SAUCE_USER, SAUCE_KEY)
+elsif BROWSERSTACK_USER && BROWSERSTACK_KEY
   Snapshotter = Browserstack.new(BROWSERSTACK_USER, BROWSERSTACK_KEY)
 else
   Snapshotter = PageSnap.new(PAGESNAP_URL)
