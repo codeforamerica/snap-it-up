@@ -7,7 +7,6 @@ gem "sinatra"
 gem "sinatra-contrib"
 gem "httparty"
 gem "aws-sdk"
-# gem "mongoid", "~> 4.0"
 gem "rake"
 gem "sentry-raven"
 

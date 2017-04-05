@@ -13,8 +13,6 @@ require 'httparty'
 require 'sinatra/activerecord'
 require 'que'
 
-# require 'mongoid'
-
 require './models/monitor_event.rb'
 require './models/snapshot.rb'
 require './models/incident.rb'
@@ -28,7 +26,6 @@ AWS_SECRET = ENV['AWS_SECRET']
 AWS_BUCKET = ENV['AWS_BUCKET']
 AWS_REGION = ENV['AWS_REGION']
 PRODUCTION = ENV['RACK_ENV'] == 'production'
-MONGO_URI = ENV['MONGO_URI'] || ENV['MONGOLAB_URI'] || "mongodb://localhost:27017/snap_it_up"
 PAGESNAP_URL = ENV['PAGESNAP_URL']
 SAUCE_USER = ENV['SAUCE_USER']
 SAUCE_KEY = ENV['SAUCE_KEY']
@@ -37,14 +34,6 @@ BROWSERSTACK_KEY = ENV['BROWSERSTACK_KEY']
 USE_WEBHOOK = (ENV['USE_WEBHOOK'] || '').downcase == 'true'
 
 configure do
-  # Mongoid.configure do |config|
-  #   config.sessions = { 
-  #     :default => {
-  #       :uri => MONGO_URI
-  #     }
-  #   }
-  # end
-  
   # TODO: should probably switch to config/database.yml
   set :database, {adapter: 'postgresql', database: 'snap-it-up-development', encoding: 'unicode', pool: '5'}
   # NOTE: Que needs a SQL schema
