@@ -19,7 +19,13 @@ class Pingometer
 
   def events(monitor=nil)
     if monitor.nil?
-      get("/events/")['events']
+      # Pingometer's API has a method to get all events:
+      #   get("/events/")['events']
+      # But it appears to fail often (it looks like it is taking too long and
+      # their load balancer or some proxy is killing the request) so instead
+      # get the events from each monitor individually. Really high overhead,
+      # but at least it works reliably :(
+      monitors.flat_map &method(:events)
     else
       id = monitor.kind_of?(Hash) ? monitor['id'] : monitor
       get("/monitors/#{id}/events/")['events']
