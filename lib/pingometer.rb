@@ -2,7 +2,7 @@ require 'httparty'
 
 class Pingometer
   include HTTParty
-  base_uri 'https://app.pingometer.com/api/v1.0'
+  base_uri 'https://api.pingometer.com/v1.1'
   headers 'Accept' => 'application/json'
 
   def initialize(user, pass)
@@ -14,7 +14,7 @@ class Pingometer
   end
 
   def monitor(id)
-    get("/monitor/#{id}/")['monitor'][0]
+    get("/monitors/#{id}/")['monitor'][0]
   end
 
   def events(monitor=nil)
@@ -22,7 +22,7 @@ class Pingometer
       get("/events/")['events']
     else
       id = monitor.kind_of?(Hash) ? monitor['id'] : monitor
-      get("/monitor/#{id}/events/")['events']
+      get("/monitors/#{id}/events/")['events']
     end
   end
 
@@ -35,7 +35,8 @@ class Pingometer
     
     # For bad gateways, timeouts, etc, give Pingometer a break then retry
     if response.code > 501 && response.code < 600 && retries > 0
-      sleep([4 - retries, 0].max * 5)
+      wait_time = [4 - retries, 0].max * 5
+      sleep(wait_time)
       get(path, options, retries - 1)
     elsif response.code != 200
       raise "Error code #{response.code} from '#{path}':\n#{response.body}"
