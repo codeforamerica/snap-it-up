@@ -66,7 +66,13 @@ else
   Snapshotter = PageSnap.new(PAGESNAP_URL)
 end
 
-MonitorList = JSON.parse(File.read('public/data/pingometer_monitors.json'))
+# TODO: this should probably be wrapped up into its own module/class
+MonitorMetadata = JSON.parse(File.read('public/data/pingometer_monitors.json'))
+MonitorList = MonitorMetadata['monitors'].collect do |monitor|
+  global_ignore = MonitorMetadata['global_settings'].fetch('ignore_dates', [])
+  monitor['ignore_dates'] = monitor.fetch('ignore_dates', []) + global_ignore
+  monitor
+end
 
 get '/' do
   # Get all states into a hash

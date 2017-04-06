@@ -1,411 +1,418 @@
-[
-    {
-        "hostname": "www.yourtexasbenefits.com",
-        "id": "54a714e9be653d45452a1320",
-        "name": "Texas | Your Texas Benefits",
-        "state": "Texas",
-        "state_abbreviation": "TX",
-        "state_code": "48",
-        "time_zone": ["CST", "MST"]
-    },
-    {
-        "hostname": "nheasy.nh.gov",
-        "id": "54a713edbe653d45452a131d",
-        "name": "New Hampshire | NH Easy",
-        "state": "New Hampshire",
-        "state_abbreviation": "NH",
-        "state_code": "33",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "coloradopeak.secure.force.com",
-        "id": "54a7140abe653d44d22a1322",
-        "name": "Colorado | PEAK",
-        "state": "Colorado",
-        "state_abbreviation": "CO",
-        "state_code": "8",
-        "time_zone": ["MST"]
-    },
-    {
-        "hostname": "kscapportalp.dcf.ks.gov",
-        "id": "54d05e25be653d2c21ff9cf6",
-        "name": "Kansas | Dept of Children and Familes",
-        "state": "Kansas",
-        "state_abbreviation": "KS",
-        "state_code": "20",
-        "time_zone": ["CST", "MST"],
+{
+    "global_settings": {
         "ignore_dates": [
-          [null, "2015-02-02T21:38:00-08:00"]
+            [null, "2017-04-06T00:00:00Z"]
         ]
     },
-    {
-        "hostname": "apps.nd.gov",
-        "id": "54be01b4be653d44f96de4fe",
-        "name": "North Dakota | OASYS",
-        "state": "North Dakota",
-        "state_abbreviation": "ND",
-        "state_code": "38",
-        "time_zone": ["CST", "MST"]
-    },
-    {
-        "hostname": "www.connect.ct.gov",
-        "id": "54a9d4f7be653d4e8d91c021",
-        "name": "Connecticut | Apply for Benefits",
-        "state": "Connecticut",
-        "state_abbreviation": "CT",
-        "state_code": "9",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "apps.state.or.us",
-        "id": "54aa11cbbe653d57ffaae759",
-        "name": "Oregon | Dept of Human Services",
-        "state": "Oregon",
-        "state_abbreviation": "OR",
-        "state_code": "41",
-        "time_zone": ["PST", "MST"]
-    },
-    {
-        "hostname": "tn.gov",
-        "id": "54a7493bbe653d4674bf5eeb",
-        "name": "Tennessee | Family Assistance Application",
-        "state": "Tennessee",
-        "state_abbreviation": "TN",
-        "state_code": "47",
-        "time_zone": ["CST", "EST"]
-    },
-    {
-        "hostname": "dpssbenefits.lacounty.gov",
-        "id": "54a79f8fbe653d4674bf5ef7",
-        "name": "LEADER (YourBenefitsNow)",
-        "state": "California",
-        "state_abbreviation": "CA",
-        "state_code": "6",
-        "time_zone": ["PST"]
-    },
-    {
-        "hostname": "www.washingtonconnection.org",
-        "id": "54a7aa68be653d4687bf5ef4",
-        "name": "Washington | Washington Connection",
-        "state": "Washington",
-        "state_abbreviation": "WA",
-        "state_code": "53",
-        "time_zone": ["PST"]
-    },
-    {
-        "hostname": "www.foodstamps.ri.gov",
-        "id": "54aa12a3be653d57ffaae75a",
-        "name": "Rhode Island | RI DHS",
-        "state": "Rhode Island",
-        "state_abbreviation": "RI",
-        "state_code": "44",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "secureapp.dhs.state.ia.us",
-        "id": "54a79d67be653d4687bf5eea",
-        "name": "Iowa | OASIS",
-        "state": "Iowa",
-        "state_abbreviation": "IA",
-        "state_code": "19",
-        "time_zone": ["CST"]
-    },
-    {
-        "hostname": "c4yourself.com",
-        "id": "54a79f58be653d4687bf5eef",
-        "name": "C4Yourself",
-        "state": "California",
-        "state_abbreviation": "CA",
-        "state_code": "6",
-        "time_zone": ["PST"]
-    },
-    {
-        "hostname": "assist.dhss.delaware.gov",
-        "id": "54a79fddbe653d4674bf5ef8",
-        "name": "Delaware | Delware ASSIST",
-        "state": "Delaware",
-        "state_abbreviation": "DE",
-        "state_code": "10",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "cafe-cp.dcfs.la.gov",
-        "id": "54a7a933be653d4687bf5ef1",
-        "name": "Louisiana | LA CAFE",
-        "state": "Louisiana",
-        "state_abbreviation": "LA",
-        "state_code": "22",
-        "time_zone": ["CST"],
-        "ignore_dates": [
-          ["2015-02-03T05:15:22.676Z", "2015-03-23T18:50:34.203Z"]
-        ]
-    },
-    {
-        "hostname": "mybenefits.ahs.state.vt.us",
-        "id": "54a7aa8bbe653d4674bf5efe",
-        "name": "Vermont | myBenefitsVT",
-        "state": "Vermont",
-        "state_abbreviation": "VT",
-        "state_code": "50",
-        "time_zone": ["EST"],
-        "ignore_dates": [
-          ["2015-03-24T13:15:48.898Z", "2015-03-27T20:36:24.649Z"]
-        ]
-    },
-    {
-        "hostname": "access.wisconsin.gov",
-        "id": "54a79db2be653d4687bf5eec",
-        "name": "Wisconsin | ACCESS",
-        "state": "Wisconsin",
-        "state_abbreviation": "WI",
-        "state_code": "55",
-        "time_zone": ["CST"]
-    },
-    {
-        "hostname": "mybenefits.ny.gov",
-        "id": "54a79d88be653d4687bf5eeb",
-        "name": "New York | MyBenefits",
-        "state": "New York",
-        "state_abbreviation": "NY",
-        "state_code": "36",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "www.myalabama.gov",
-        "id": "54a79e9bbe653d4687bf5eed",
-        "name": "Alabama | My Alabama",
-        "state": "Alabama",
-        "state_abbreviation": "AL",
-        "state_code": "1",
-        "time_zone": ["CST"]
-    },
-    {
-        "hostname": "www.healthearizonaplus.gov",
-        "id": "54a79f09be653d4687bf5eee",
-        "name": "Arizona | Health-e Arizona",
-        "state": "Arizona",
-        "state_abbreviation": "AZ",
-        "state_code": "4",
-        "time_zone": ["MST"]
-    },
-    {
-        "hostname": "compass.ga.gov",
-        "id": "54a7a027be653d4674bf5ef9",
-        "name": "Georgia | COMPASS",
-        "state": "Georgia",
-        "state_abbreviation": "GA",
-        "state_code": "13",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "abe.illinois.gov",
-        "id": "54a7a085be653d4674bf5efa",
-        "name": "Illinois | ABE",
-        "state": "Illinois",
-        "state_abbreviation": "IL",
-        "state_code": "17",
-        "time_zone": ["CST"]
-    },
-    {
-        "hostname": "www.ifcem.com",
-        "id": "54d05a90be653d2e76ff9ce7",
-        "name": "Indiana | FSSA Benefits Portal",
-        "state": "Indiana",
-        "state_abbreviation": "IN",
-        "state_code": "18",
-        "time_zone": ["CST", "EST"],
-        "ignore_dates": [
-          [null, "2015-02-02T21:32:00-08:00"],
-          ["2015-03-02T00:00:00Z", null]
-        ]
-    },
-    {
-        "hostname": "www.wvinroads.org",
-        "id": "54a7a9f5be653d4687bf5ef3",
-        "name": "West Virginia | InRoads",
-        "state": "West Virginia",
-        "state_abbreviation": "WV",
-        "state_code": "54",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "jobs.utah.gov",
-        "id": "54a7aab1be653d4674bf5eff",
-        "name": "Utah | myCase",
-        "state": "Utah",
-        "state_abbreviation": "UT",
-        "state_code": "49",
-        "time_zone": ["MST"]
-    },
-    {
-        "hostname": "scmapp.sc.gov",
-        "id": "54a7aad0be653d4687bf5ef5",
-        "name": "South Carolina | SCMAPP",
-        "state": "South Carolina",
-        "state_abbreviation": "SC",
-        "state_code": "45",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "commonhelp.virginia.gov",
-        "id": "54bc3516be653d3f4f065dc5",
-        "name": "Virgina | CommonHelp",
-        "state": "Virginia",
-        "state_abbreviation": "VA",
-        "state_code": "51",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "accessnevada.dwss.nv.gov",
-        "id": "54bc9125be653d3f8a065dc5",
-        "name": "Nevada | Access Nevada",
-        "state": "Nevada",
-        "state_abbreviation": "NV",
-        "state_code": "32",
-        "time_zone": ["PST", "MST"]
-    },
-    {
-        "hostname": "accessnevada.dwss.nv.gov",
-        "id": "54bc36d9be653d3f4f065dc6",
-        "name": "Nevada | Access Nevada (2)",
-        "state": "Nevada",
-        "state_abbreviation": "NV",
-        "state_code": "32",
-        "time_zone": ["PST", "MST"]
-    },
-    {
-        "hostname": "applymn.dhs.mn.gov",
-        "id": "54bc3fe3be653d3f71065dc4",
-        "name": "Minnesota | Apply MN",
-        "state": "Minnesota",
-        "state_abbreviation": "MN",
-        "state_code": "27",
-        "time_zone": ["CST"]
-    },
-    {
-        "hostname": "service.hhs.state.ma.us",
-        "id": "54bc3a5bbe653d3f4f065dca",
-        "name": "Massachusetts |Virtual Gateway",
-        "state": "Massachusetts",
-        "state_abbreviation": "MA",
-        "state_code": "25",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "dhhs-access-neb-menu.ne.gov",
-        "id": "54bc37aebe653d3f4f065dc7",
-        "name": "Nebraska | Access Nebraska",
-        "state": "Nebraska",
-        "state_abbreviation": "NE",
-        "state_code": "31",
-        "time_zone": ["CST", "MST"]
-    },
-    {
-        "hostname": "www.mybenefitscalwin.org",
-        "id": "54bc8944be653d3f86065dc5",
-        "name": "MyBenefitsCalWIN",
-        "state": "California",
-        "state_abbreviation": "CA",
-        "state_code": "6",
-        "time_zone": ["PST"]
-    },
-    {
-        "hostname": "www.marylandsail.org",
-        "id": "54bc89b8be653d3f86065dc6",
-        "name": "Maryland | SAIL",
-        "state": "Maryland",
-        "state_abbreviation": "MD",
-        "state_code": "24",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "apply.mt.gov",
-        "id": "54bc3892be653d3f4f065dc8",
-        "name": "Montana | Montana DPHSS Apply ",
-        "state": "Montana",
-        "state_abbreviation": "MT",
-        "state_code": "30",
-        "time_zone": ["MST"]
-    },
-    {
-        "hostname": "access.arkansas.gov",
-        "id": "54bc3c27be653d3f71065dc3",
-        "name": "Arkansas | Access Arkansas",
-        "state": "Arkansas",
-        "state_abbreviation": "AR",
-        "state_code": "5",
-        "time_zone": ["CST"]
-    },
-    {
-        "hostname": "www.compass.state.pa.us",
-        "id": "54bc2ad6be653d3f49065dc2",
-        "name": "Pennsylvania | COMPASS",
-        "state": "Pennsylvania",
-        "state_abbreviation": "PA",
-        "state_code": "42",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "www.okdhslive.org",
-        "id": "54bc2bf7be653d3f4f065dc2",
-        "name": "Oklahoma |OKDHS Live!",
-        "state": "Oklahoma",
-        "state_abbreviation": "OK",
-        "state_code": "40",
-        "time_zone": ["CST"]
-    },
-    {
-        "hostname": "odjfsbenefits.ohio.gov",
-        "id": "54bc2f2dbe653d3f4f065dc3",
-        "name": "Ohio | Online Benefit Application",
-        "state": "Ohio",
-        "state_abbreviation": "OH",
-        "state_code": "39",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "www.yes.state.nm.us",
-        "id": "54bc3265be653d3f4a065dc3",
-        "name": "New Mexico | YES New Mexico",
-        "state": "New Mexico",
-        "state_abbreviation": "NM",
-        "state_code": "35",
-        "time_zone": ["CST"]
-    },
-    {
-        "hostname": "prd.chfs.ky.gov",
-        "id": "54bc3aeebe653d3f6d065dc2",
-        "name": "Kentucky |SNAP Web Portal",
-        "state": "Kentucky",
-        "state_abbreviation": "KY",
-        "state_code": "21",
-        "time_zone": ["CST", "EST"]
-    },
-    {
-        "hostname": "dcf-access.dcf.state.fl.us",
-        "id": "54bc3b79be653d3f71065dc2",
-        "name": "Florida | ACCESS Florida",
-        "state": "Florida",
-        "state_abbreviation": "FL",
-        "state_code": "12",
-        "time_zone": ["CST", "EST"]
-    },
-    {
-        "hostname": "epass.nc.gov",
-        "id": "54bc8a0ebe653d3f8a065dc4",
-        "name": "North Carolina | ePASS",
-        "state": "North Carolina",
-        "state_abbreviation": "NC",
-        "state_code": "37",
-        "time_zone": ["EST"]
-    },
-    {
-        "hostname": "oneapp.dhs.state.nj.us",
-        "id": "54bc9010be653d3f86065dc7",
-        "name": "New Jersey |NJOneApp",
-        "state": "New Jersey",
-        "state_abbreviation": "NJ",
-        "state_code": "34",
-        "time_zone": ["EST"]
-    }
-]
+    "monitors": [
+        {
+            "hostname": "www.yourtexasbenefits.com",
+            "id": "54a714e9be653d45452a1320",
+            "name": "Texas | Your Texas Benefits",
+            "state": "Texas",
+            "state_abbreviation": "TX",
+            "state_code": "48",
+            "time_zone": ["CST", "MST"]
+        },
+        {
+            "hostname": "nheasy.nh.gov",
+            "id": "54a713edbe653d45452a131d",
+            "name": "New Hampshire | NH Easy",
+            "state": "New Hampshire",
+            "state_abbreviation": "NH",
+            "state_code": "33",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "coloradopeak.secure.force.com",
+            "id": "54a7140abe653d44d22a1322",
+            "name": "Colorado | PEAK",
+            "state": "Colorado",
+            "state_abbreviation": "CO",
+            "state_code": "8",
+            "time_zone": ["MST"]
+        },
+        {
+            "hostname": "kscapportalp.dcf.ks.gov",
+            "id": "54d05e25be653d2c21ff9cf6",
+            "name": "Kansas | Dept of Children and Familes",
+            "state": "Kansas",
+            "state_abbreviation": "KS",
+            "state_code": "20",
+            "time_zone": ["CST", "MST"],
+            "ignore_dates": [
+            [null, "2015-02-02T21:38:00-08:00"]
+            ]
+        },
+        {
+            "hostname": "apps.nd.gov",
+            "id": "54be01b4be653d44f96de4fe",
+            "name": "North Dakota | OASYS",
+            "state": "North Dakota",
+            "state_abbreviation": "ND",
+            "state_code": "38",
+            "time_zone": ["CST", "MST"]
+        },
+        {
+            "hostname": "www.connect.ct.gov",
+            "id": "54a9d4f7be653d4e8d91c021",
+            "name": "Connecticut | Apply for Benefits",
+            "state": "Connecticut",
+            "state_abbreviation": "CT",
+            "state_code": "9",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "apps.state.or.us",
+            "id": "54aa11cbbe653d57ffaae759",
+            "name": "Oregon | Dept of Human Services",
+            "state": "Oregon",
+            "state_abbreviation": "OR",
+            "state_code": "41",
+            "time_zone": ["PST", "MST"]
+        },
+        {
+            "hostname": "tn.gov",
+            "id": "54a7493bbe653d4674bf5eeb",
+            "name": "Tennessee | Family Assistance Application",
+            "state": "Tennessee",
+            "state_abbreviation": "TN",
+            "state_code": "47",
+            "time_zone": ["CST", "EST"]
+        },
+        {
+            "hostname": "dpssbenefits.lacounty.gov",
+            "id": "54a79f8fbe653d4674bf5ef7",
+            "name": "LEADER (YourBenefitsNow)",
+            "state": "California",
+            "state_abbreviation": "CA",
+            "state_code": "6",
+            "time_zone": ["PST"]
+        },
+        {
+            "hostname": "www.washingtonconnection.org",
+            "id": "54a7aa68be653d4687bf5ef4",
+            "name": "Washington | Washington Connection",
+            "state": "Washington",
+            "state_abbreviation": "WA",
+            "state_code": "53",
+            "time_zone": ["PST"]
+        },
+        {
+            "hostname": "www.foodstamps.ri.gov",
+            "id": "54aa12a3be653d57ffaae75a",
+            "name": "Rhode Island | RI DHS",
+            "state": "Rhode Island",
+            "state_abbreviation": "RI",
+            "state_code": "44",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "secureapp.dhs.state.ia.us",
+            "id": "54a79d67be653d4687bf5eea",
+            "name": "Iowa | OASIS",
+            "state": "Iowa",
+            "state_abbreviation": "IA",
+            "state_code": "19",
+            "time_zone": ["CST"]
+        },
+        {
+            "hostname": "c4yourself.com",
+            "id": "54a79f58be653d4687bf5eef",
+            "name": "C4Yourself",
+            "state": "California",
+            "state_abbreviation": "CA",
+            "state_code": "6",
+            "time_zone": ["PST"]
+        },
+        {
+            "hostname": "assist.dhss.delaware.gov",
+            "id": "54a79fddbe653d4674bf5ef8",
+            "name": "Delaware | Delware ASSIST",
+            "state": "Delaware",
+            "state_abbreviation": "DE",
+            "state_code": "10",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "cafe-cp.dcfs.la.gov",
+            "id": "54a7a933be653d4687bf5ef1",
+            "name": "Louisiana | LA CAFE",
+            "state": "Louisiana",
+            "state_abbreviation": "LA",
+            "state_code": "22",
+            "time_zone": ["CST"],
+            "ignore_dates": [
+            ["2015-02-03T05:15:22.676Z", "2015-03-23T18:50:34.203Z"]
+            ]
+        },
+        {
+            "hostname": "mybenefits.ahs.state.vt.us",
+            "id": "54a7aa8bbe653d4674bf5efe",
+            "name": "Vermont | myBenefitsVT",
+            "state": "Vermont",
+            "state_abbreviation": "VT",
+            "state_code": "50",
+            "time_zone": ["EST"],
+            "ignore_dates": [
+            ["2015-03-24T13:15:48.898Z", "2015-03-27T20:36:24.649Z"]
+            ]
+        },
+        {
+            "hostname": "access.wisconsin.gov",
+            "id": "54a79db2be653d4687bf5eec",
+            "name": "Wisconsin | ACCESS",
+            "state": "Wisconsin",
+            "state_abbreviation": "WI",
+            "state_code": "55",
+            "time_zone": ["CST"]
+        },
+        {
+            "hostname": "mybenefits.ny.gov",
+            "id": "54a79d88be653d4687bf5eeb",
+            "name": "New York | MyBenefits",
+            "state": "New York",
+            "state_abbreviation": "NY",
+            "state_code": "36",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "www.myalabama.gov",
+            "id": "54a79e9bbe653d4687bf5eed",
+            "name": "Alabama | My Alabama",
+            "state": "Alabama",
+            "state_abbreviation": "AL",
+            "state_code": "1",
+            "time_zone": ["CST"]
+        },
+        {
+            "hostname": "www.healthearizonaplus.gov",
+            "id": "54a79f09be653d4687bf5eee",
+            "name": "Arizona | Health-e Arizona",
+            "state": "Arizona",
+            "state_abbreviation": "AZ",
+            "state_code": "4",
+            "time_zone": ["MST"]
+        },
+        {
+            "hostname": "compass.ga.gov",
+            "id": "54a7a027be653d4674bf5ef9",
+            "name": "Georgia | COMPASS",
+            "state": "Georgia",
+            "state_abbreviation": "GA",
+            "state_code": "13",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "abe.illinois.gov",
+            "id": "54a7a085be653d4674bf5efa",
+            "name": "Illinois | ABE",
+            "state": "Illinois",
+            "state_abbreviation": "IL",
+            "state_code": "17",
+            "time_zone": ["CST"]
+        },
+        {
+            "hostname": "www.ifcem.com",
+            "id": "54d05a90be653d2e76ff9ce7",
+            "name": "Indiana | FSSA Benefits Portal",
+            "state": "Indiana",
+            "state_abbreviation": "IN",
+            "state_code": "18",
+            "time_zone": ["CST", "EST"],
+            "ignore_dates": [
+            [null, "2015-02-02T21:32:00-08:00"],
+            ["2015-03-02T00:00:00Z", null]
+            ]
+        },
+        {
+            "hostname": "www.wvinroads.org",
+            "id": "54a7a9f5be653d4687bf5ef3",
+            "name": "West Virginia | InRoads",
+            "state": "West Virginia",
+            "state_abbreviation": "WV",
+            "state_code": "54",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "jobs.utah.gov",
+            "id": "54a7aab1be653d4674bf5eff",
+            "name": "Utah | myCase",
+            "state": "Utah",
+            "state_abbreviation": "UT",
+            "state_code": "49",
+            "time_zone": ["MST"]
+        },
+        {
+            "hostname": "scmapp.sc.gov",
+            "id": "54a7aad0be653d4687bf5ef5",
+            "name": "South Carolina | SCMAPP",
+            "state": "South Carolina",
+            "state_abbreviation": "SC",
+            "state_code": "45",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "commonhelp.virginia.gov",
+            "id": "54bc3516be653d3f4f065dc5",
+            "name": "Virgina | CommonHelp",
+            "state": "Virginia",
+            "state_abbreviation": "VA",
+            "state_code": "51",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "accessnevada.dwss.nv.gov",
+            "id": "54bc9125be653d3f8a065dc5",
+            "name": "Nevada | Access Nevada",
+            "state": "Nevada",
+            "state_abbreviation": "NV",
+            "state_code": "32",
+            "time_zone": ["PST", "MST"]
+        },
+        {
+            "hostname": "accessnevada.dwss.nv.gov",
+            "id": "54bc36d9be653d3f4f065dc6",
+            "name": "Nevada | Access Nevada (2)",
+            "state": "Nevada",
+            "state_abbreviation": "NV",
+            "state_code": "32",
+            "time_zone": ["PST", "MST"]
+        },
+        {
+            "hostname": "applymn.dhs.mn.gov",
+            "id": "54bc3fe3be653d3f71065dc4",
+            "name": "Minnesota | Apply MN",
+            "state": "Minnesota",
+            "state_abbreviation": "MN",
+            "state_code": "27",
+            "time_zone": ["CST"]
+        },
+        {
+            "hostname": "service.hhs.state.ma.us",
+            "id": "54bc3a5bbe653d3f4f065dca",
+            "name": "Massachusetts |Virtual Gateway",
+            "state": "Massachusetts",
+            "state_abbreviation": "MA",
+            "state_code": "25",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "dhhs-access-neb-menu.ne.gov",
+            "id": "54bc37aebe653d3f4f065dc7",
+            "name": "Nebraska | Access Nebraska",
+            "state": "Nebraska",
+            "state_abbreviation": "NE",
+            "state_code": "31",
+            "time_zone": ["CST", "MST"]
+        },
+        {
+            "hostname": "www.mybenefitscalwin.org",
+            "id": "54bc8944be653d3f86065dc5",
+            "name": "MyBenefitsCalWIN",
+            "state": "California",
+            "state_abbreviation": "CA",
+            "state_code": "6",
+            "time_zone": ["PST"]
+        },
+        {
+            "hostname": "www.marylandsail.org",
+            "id": "54bc89b8be653d3f86065dc6",
+            "name": "Maryland | SAIL",
+            "state": "Maryland",
+            "state_abbreviation": "MD",
+            "state_code": "24",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "apply.mt.gov",
+            "id": "54bc3892be653d3f4f065dc8",
+            "name": "Montana | Montana DPHSS Apply ",
+            "state": "Montana",
+            "state_abbreviation": "MT",
+            "state_code": "30",
+            "time_zone": ["MST"]
+        },
+        {
+            "hostname": "access.arkansas.gov",
+            "id": "54bc3c27be653d3f71065dc3",
+            "name": "Arkansas | Access Arkansas",
+            "state": "Arkansas",
+            "state_abbreviation": "AR",
+            "state_code": "5",
+            "time_zone": ["CST"]
+        },
+        {
+            "hostname": "www.compass.state.pa.us",
+            "id": "54bc2ad6be653d3f49065dc2",
+            "name": "Pennsylvania | COMPASS",
+            "state": "Pennsylvania",
+            "state_abbreviation": "PA",
+            "state_code": "42",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "www.okdhslive.org",
+            "id": "54bc2bf7be653d3f4f065dc2",
+            "name": "Oklahoma |OKDHS Live!",
+            "state": "Oklahoma",
+            "state_abbreviation": "OK",
+            "state_code": "40",
+            "time_zone": ["CST"]
+        },
+        {
+            "hostname": "odjfsbenefits.ohio.gov",
+            "id": "54bc2f2dbe653d3f4f065dc3",
+            "name": "Ohio | Online Benefit Application",
+            "state": "Ohio",
+            "state_abbreviation": "OH",
+            "state_code": "39",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "www.yes.state.nm.us",
+            "id": "54bc3265be653d3f4a065dc3",
+            "name": "New Mexico | YES New Mexico",
+            "state": "New Mexico",
+            "state_abbreviation": "NM",
+            "state_code": "35",
+            "time_zone": ["CST"]
+        },
+        {
+            "hostname": "prd.chfs.ky.gov",
+            "id": "54bc3aeebe653d3f6d065dc2",
+            "name": "Kentucky |SNAP Web Portal",
+            "state": "Kentucky",
+            "state_abbreviation": "KY",
+            "state_code": "21",
+            "time_zone": ["CST", "EST"]
+        },
+        {
+            "hostname": "dcf-access.dcf.state.fl.us",
+            "id": "54bc3b79be653d3f71065dc2",
+            "name": "Florida | ACCESS Florida",
+            "state": "Florida",
+            "state_abbreviation": "FL",
+            "state_code": "12",
+            "time_zone": ["CST", "EST"]
+        },
+        {
+            "hostname": "epass.nc.gov",
+            "id": "54bc8a0ebe653d3f8a065dc4",
+            "name": "North Carolina | ePASS",
+            "state": "North Carolina",
+            "state_abbreviation": "NC",
+            "state_code": "37",
+            "time_zone": ["EST"]
+        },
+        {
+            "hostname": "oneapp.dhs.state.nj.us",
+            "id": "54bc9010be653d3f86065dc7",
+            "name": "New Jersey |NJOneApp",
+            "state": "New Jersey",
+            "state_abbreviation": "NJ",
+            "state_code": "34",
+            "time_zone": ["EST"]
+        }
+    ]
+}
