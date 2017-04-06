@@ -29,12 +29,18 @@ class Pingometer
 
   protected
 
-  def get(path, options={})
+  def get(path, options={}, retries = 3)
     options.merge!({basic_auth: @auth})
     response = self.class.get(path, options)
-    if response.code != 200
-      raise response.body
+    
+    # For bad gateways, timeouts, etc, give Pingometer a break then retry
+    if response.code > 501 && response.code < 600 && retries > 0
+      sleep([4 - retries, 0].max * 5)
+      get(path, options, retries - 1)
+    elsif response.code != 200
+      raise "Error code #{response.code} from '#{path}':\n#{response.body}"
     end
+    
     response
   end
 

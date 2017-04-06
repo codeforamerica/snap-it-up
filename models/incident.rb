@@ -1,33 +1,43 @@
-class Incident
-  include Mongoid::Document
+class Incident < ActiveRecord::Base
+  has_many :events, class_name: 'MonitorEvent', inverse_of: :incident
   
-  field :monitor, type: String
-  field :state, type: String
-  field :start_date
-  field :end_date
-  field :events, type: Array, default: []  # of BSON IDs
-  field :milliseconds
-  field :accepted, type: Boolean, default: true
+  # The `accepted` field represents whether an incident should be used. Some
+  # monitors are known to have been incorrectly configured during certain time
+  # periods -- we want to collect all event data, but mark events/incidents
+  # from those time periods as not accepted.
+  
+  # TODO: only include accepted incidents in the default scope?
+  # TODO: remove `milliseconds`. This can just as easily be computed on demand
   
   def self.current
-    self.where(end_date: nil).order({start_date: -1})
+    where(end_date: nil).order(start_date: :desc)
   end
   
   def self.intersecting(start_date, end_date)
-    self.or(
-      {:start_date.lte => end_date, :end_date.gte => start_date},
-      {:start_date => nil, :end_date.gte => start_date},
-      {:start_date.lte => end_date, :end_date => nil}
-    )
+    values = {start_date: start_date, end_date: end_date}
+    where('start_date <= :end_date AND end_date >= :start_date', values)
+      .or(where('start_date IS NULL AND end_date >= :start_date', values))
+      .or(where('start_date <= :end_date AND end_date IS NULL', values))
   end
   
+  # TODO: make this a `before_add` and `after_add` callback?
+  # (This method is a legacy of our old Mongoid setup)
   def add_event(event)
-    # Don't re-add events or add UP events to a closed incident
-    if events.include?(event.id) || (!ongoing? && event.up?)
+    begin
+      add_event!(event)
+    rescue
       return false
     end
+    true
+  end
+  
+  def add_event!(event)
+    # Don't add UP events to a closed incident
+    if !ongoing? && event.up?
+      raise 'Cannot add an "UP" event to a closed incident'
+    end
     
-    self.events << event.id
+    self.events << event
     
     # If unset, populate various attributes from event
     if start_date.nil? || (!event.up? && event.date < start_date)
@@ -53,7 +63,7 @@ class Incident
       self.accepted = false
     end
     
-    return true
+    self.save
   end
   
   def ongoing?

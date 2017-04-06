@@ -265,6 +265,15 @@
         "time_zone": ["PST", "MST"]
     },
     {
+        "hostname": "accessnevada.dwss.nv.gov",
+        "id": "54bc36d9be653d3f4f065dc6",
+        "name": "Nevada | Access Nevada (2)",
+        "state": "Nevada",
+        "state_abbreviation": "NV",
+        "state_code": "32",
+        "time_zone": ["PST", "MST"]
+    },
+    {
         "hostname": "applymn.dhs.mn.gov",
         "id": "54bc3fe3be653d3f71065dc4",
         "name": "Minnesota | Apply MN",

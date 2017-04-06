@@ -1,20 +1,20 @@
-class MonitorEvent
-  include Mongoid::Document
+class MonitorEvent < ActiveRecord::Base
+  belongs_to :incident, inverse_of: :events
+  has_many :snapshots, foreign_key: 'event_id', inverse_of: :event
   
-  # pingometer_id will often not be filled in because it was, until recently,
-  # available only for the latest event in Pingometer's API.
-  field :pingometer_id, type: String
+  # NOTE: the `pingometer_id` field will often not be filled in because it was,
+  # until recently, available only for the latest event in Pingometer's API.
   
-  field :monitor, type: String
-  field :status, type: Integer
-  field :date
-  field :state, type: String
-  field :accepted, type: Boolean, default: true
+  # The `accepted` field represents whether an event should be considered. Some
+  # monitors are known to have been incorrectly configured during certain time
+  # periods -- we want to collect all event data, but mark event from those
+  # time periods as not accepted.
+  # TODO: only include accepted events in the default scope?
   
-  default_scope ->{ order({date: 1}) }
+  default_scope { order(:date) }
   
   def self.latest
-    self.order({date: -1}).first
+    self.last
   end
   
   def self.from_pingometer(pingometer_event, monitor=nil, state=nil)

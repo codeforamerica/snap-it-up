@@ -1,9 +1,5 @@
-class LoadPingometerEvents
-  def self.perform(monitor_id=nil)
-    self.new.perform(monitor_id)
-  end
-
-  def perform(monitor_id=nil)
+class LoadPingometerEvents < Que::Job
+  def run(monitor_id=nil)
     monitor_log = monitor_id ? " for #{monitor_id}" : ""
     puts "Loading events from Pingometer#{monitor_log}"
 
@@ -28,7 +24,7 @@ class LoadPingometerEvents
   def load_events
     with_new_events = load_monitor_events
     with_new_events.each do |monitor_id|
-      Qu.enqueue(SnapshotMonitor, monitor_id)
+      SnapshotMonitor.enqueue(monitor_id)
     end
   end
 
@@ -36,7 +32,9 @@ class LoadPingometerEvents
     puts "  Loading events"
 
     monitor_states = Hash[monitors.collect do |monitor|
-      [monitor['id'], monitor_state(monitor)['state_abbreviation']]
+      metadata = monitor_state(monitor)
+      abbreviation = metadata ? metadata['state_abbreviation'] : '[UNKNOWN]'
+      [monitor['id'], abbreviation]
     end]
 
     new_events = {}

@@ -1,9 +1,5 @@
-class SnapshotMonitor
-  def self.perform(monitor_id)
-    self.new.perform(monitor_id)
-  end
-  
-  def perform(monitor_id)
+class SnapshotMonitor < Que::Job
+  def run(monitor_id)
     puts "Snapshotting #{monitor_id}"
     
     begin
@@ -26,7 +22,6 @@ class SnapshotMonitor
       monitor: monitor_id,
       status: state_status,
       event_id: last_event.id,
-      event_pingometer_id: last_event.pingometer_id,
       date: Time.now,
       name: file_name,
       url: url

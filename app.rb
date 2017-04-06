@@ -7,10 +7,12 @@ require 'fileutils'
 require './lib/pingometer.rb'
 require './lib/pagesnap.rb'
 require './lib/browserstack.rb'
+require './lib/sauce_labs.rb'
 require 'aws-sdk'
 require 'httparty'
-require 'mongoid'
-require 'qu-mongoid'
+require 'sinatra/activerecord'
+require 'que'
+
 require './models/monitor_event.rb'
 require './models/snapshot.rb'
 require './models/incident.rb'
@@ -24,20 +26,31 @@ AWS_SECRET = ENV['AWS_SECRET']
 AWS_BUCKET = ENV['AWS_BUCKET']
 AWS_REGION = ENV['AWS_REGION']
 PRODUCTION = ENV['RACK_ENV'] == 'production'
-MONGO_URI = ENV['MONGO_URI'] || ENV['MONGOLAB_URI'] || "mongodb://localhost:27017/snap_it_up"
 PAGESNAP_URL = ENV['PAGESNAP_URL']
+SAUCE_USER = ENV['SAUCE_USER']
+SAUCE_KEY = ENV['SAUCE_KEY']
 BROWSERSTACK_USER = ENV['BROWSERSTACK_USER']
 BROWSERSTACK_KEY = ENV['BROWSERSTACK_KEY']
 USE_WEBHOOK = (ENV['USE_WEBHOOK'] || '').downcase == 'true'
 
 configure do
-  Mongoid.configure do |config|
-    config.sessions = { 
-      :default => {
-        :uri => MONGO_URI
-      }
-    }
+  # TODO: should probably switch to config/database.yml
+  db_settings = {
+    adapter: 'postgresql',
+    encoding: 'unicode',
+    pool: '5'
+  }
+  if ENV['DATABASE_URL']
+    db_settings[:url] = ENV['DATABASE_URL']
+  else
+    db_settings[:database] = 'snap-it-up-development'
   end
+  set :database, db_settings
+  # NOTE: Que needs a SQL schema
+  ActiveRecord::Base.schema_format = :sql
+  
+  Que.mode = :off
+  Que.connection = ActiveRecord
 end
 
 Aws.config.merge!({
@@ -45,7 +58,9 @@ Aws.config.merge!({
   region: AWS_REGION || 'us-east-1'
 })
 
-if BROWSERSTACK_USER && BROWSERSTACK_KEY
+if SAUCE_USER && SAUCE_KEY
+  Snapshotter = SauceLabs.new(SAUCE_USER, SAUCE_KEY)
+elsif BROWSERSTACK_USER && BROWSERSTACK_KEY
   Snapshotter = Browserstack.new(BROWSERSTACK_USER, BROWSERSTACK_KEY)
 else
   Snapshotter = PageSnap.new(PAGESNAP_URL)
@@ -84,7 +99,7 @@ get '/states/:state_abbreviation' do
   end
   
   state = monitors[0]["state"]
-  snapshots = Snapshot.where(state: state_abbreviation.upcase).sort(date: -1)
+  snapshots = Snapshot.where(state: state_abbreviation.upcase).order(date: :desc)
   
   begin
     all_monitors = Pingometer.new(PINGOMETER_USER, PINGOMETER_PASS).monitors
@@ -173,8 +188,6 @@ post '/hooks/event' do
   last_incident = Incident.where(monitor: params[:monitor_id]).current.first || Incident.new
   last_incident.add_event(local_event)
   last_incident.save
-  
-  Qu.enqueue(SnapshotMonitor, params[:monitor_id])
   
   return { message: "Event saved." }.to_json
 end
