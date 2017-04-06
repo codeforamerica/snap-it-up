@@ -56,7 +56,7 @@ CREATE TABLE incidents (
     state character varying,
     start_date timestamp without time zone,
     end_date timestamp without time zone,
-    milliseconds integer,
+    milliseconds bigint,
     accepted boolean DEFAULT true,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -179,7 +179,6 @@ CREATE TABLE snapshots (
     event_id integer,
     monitor character varying,
     status character varying,
-    event_pingometer_id character varying,
     date timestamp without time zone NOT NULL,
     name character varying NOT NULL,
     url character varying,
