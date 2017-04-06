@@ -35,7 +35,17 @@ USE_WEBHOOK = (ENV['USE_WEBHOOK'] || '').downcase == 'true'
 
 configure do
   # TODO: should probably switch to config/database.yml
-  set :database, {adapter: 'postgresql', database: 'snap-it-up-development', encoding: 'unicode', pool: '5'}
+  db_settings = {
+    adapter: 'postgresql',
+    encoding: 'unicode',
+    pool: '5'
+  }
+  if ENV['DATABASE_URL']
+    db_settings[:url] = ENV['DATABASE_URL']
+  else
+    db_settings[:database] = 'snap-it-up-development'
+  end
+  set :database, db_settings
   # NOTE: Que needs a SQL schema
   ActiveRecord::Base.schema_format = :sql
   
