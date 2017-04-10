@@ -22,10 +22,18 @@ class LoadPingometerEvents < Que::Job
   end
 
   def load_events
-    with_new_events = load_monitor_events
-    with_new_events.each do |monitor_id|
-      SnapshotMonitor.enqueue(monitor_id)
-    end
+    new_events_by_monitor = load_monitor_events
+    
+    # Create snapshots for any events that were relatively current. We may have
+    # imported an event from long ago; snapshotting it now would be inaccurate.
+    new_events_by_monitor
+      .select do |monitor_id, events|
+        events.any? {|event| Time.now - 1.hour < event.date}
+      end
+      .keys
+      .each do |monitor_id|
+        SnapshotMonitor.enqueue(monitor_id)
+      end
   end
 
   def load_monitor_events
@@ -37,7 +45,7 @@ class LoadPingometerEvents < Que::Job
       [monitor['id'], abbreviation]
     end]
 
-    new_events = {}
+    new_events = Hash.new {|hash, key| hash[key] = []}
     client.events(@monitor_id).each do |event|
       monitor_id = event['monitor_id']
       model = MonitorEvent.from_pingometer(
@@ -48,11 +56,11 @@ class LoadPingometerEvents < Que::Job
       if !MonitorEvent.where(monitor: model.monitor, date: model.date).exists?
         model.accepted = accept_item?(model)
         model.save
-        new_events[monitor_id] = true
+        new_events[monitor_id] << model
       end
     end
 
-    new_events.collect {|id, _| id}
+    new_events
   end
 
   def accept_item?(item)

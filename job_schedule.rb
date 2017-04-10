@@ -2,5 +2,5 @@ require 'clockwork'
 require './app.rb'
 
 module Clockwork
-  every(2.minutes, "pingometer.etl") { LoadPingometerEvents.enqueue }
+  every(5.minutes, "pingometer.etl") { LoadPingometerEvents.enqueue }
 end

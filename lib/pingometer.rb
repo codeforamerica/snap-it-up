@@ -2,7 +2,7 @@ require 'httparty'
 
 class Pingometer
   include HTTParty
-  base_uri 'https://app.pingometer.com/api/v1.0'
+  base_uri 'https://api.pingometer.com/v1.1'
   headers 'Accept' => 'application/json'
 
   def initialize(user, pass)
@@ -14,15 +14,21 @@ class Pingometer
   end
 
   def monitor(id)
-    get("/monitor/#{id}/")['monitor'][0]
+    get("/monitors/#{id}/")['monitor'][0]
   end
 
   def events(monitor=nil)
     if monitor.nil?
-      get("/events/")['events']
+      # Pingometer's API has a method to get all events:
+      #   get("/events/")['events']
+      # But it appears to fail often (it looks like it is taking too long and
+      # their load balancer or some proxy is killing the request) so instead
+      # get the events from each monitor individually. Really high overhead,
+      # but at least it works reliably :(
+      monitors.flat_map &method(:events)
     else
       id = monitor.kind_of?(Hash) ? monitor['id'] : monitor
-      get("/monitor/#{id}/events/")['events']
+      get("/monitors/#{id}/events/")['events']
     end
   end
 
@@ -35,7 +41,8 @@ class Pingometer
     
     # For bad gateways, timeouts, etc, give Pingometer a break then retry
     if response.code > 501 && response.code < 600 && retries > 0
-      sleep([4 - retries, 0].max * 5)
+      wait_time = [4 - retries, 0].max * 5
+      sleep(wait_time)
       get(path, options, retries - 1)
     elsif response.code != 200
       raise "Error code #{response.code} from '#{path}':\n#{response.body}"
