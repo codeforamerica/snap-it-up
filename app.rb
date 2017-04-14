@@ -272,7 +272,7 @@ def state_uptimes_between(t1, t2)
         end
       end
       
-      if monitor_time
+      if monitor_time > 0
         (monitor_time - downtime) / monitor_time
       else
         1000
