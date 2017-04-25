@@ -313,7 +313,10 @@
             "state": "California",
             "state_abbreviation": "CA",
             "state_code": "6",
-            "time_zone": ["PST"]
+            "time_zone": ["PST"],
+            "ignore_dates": [
+                ["2015-08-09T05:21:00Z", "2017-04-14T17:15:00Z"]
+            ]
         },
         {
             "hostname": "www.marylandsail.org",
